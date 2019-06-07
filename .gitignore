@@ -1,5 +1,5 @@
 
 .idea/*
 *.pyc
-yolo-object-detection/images/*
 yolo-object-detection/videos/*
+yolo-object-detection/output/*
