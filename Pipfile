@@ -19,6 +19,9 @@ tqdm = "*"
 requests = "*"
 imutils = "*"
 pytest = "*"
+opencv-contrib-python = "*"
+pip = "*"
+rx = "==3.0.0b4"
 
 [requires]
 python_version = "3.6"
