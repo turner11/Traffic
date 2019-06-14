@@ -55,6 +55,8 @@ class Orchstrator(object):
                     break
         finally:
             cap.release()
+            cv2.destroyAllWindows()
+
         observer.on_completed()
 
     def start(self):
