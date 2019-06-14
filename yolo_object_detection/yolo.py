@@ -8,8 +8,11 @@ import numpy as np
 import argparse
 import time
 import cv2
-import os
+
 import logging
+
+from yolo_object_detection.configurations import yolo_detector_folders
+from yolo_object_detection.yolo_config_folder import YoloFolder
 
 logger = logging.getLogger(__name__)
 
@@ -20,25 +23,21 @@ DEFAULT_THRESHOLD = 0.3
 class YoloDetector(object):
     """"""
 
-    def __init__(self, labels_path: Union[str, Path],
-                 config_path: Union[str, Path],
-                 weights_path: Union[str, Path],
+    def __init__(self, yolo_folder: YoloFolder,
                  min_confidence: float = DEFAULT_CONFIDENCE,
-                 threshold: float = DEFAULT_THRESHOLD) -> None:
+                 threshold: float = DEFAULT_THRESHOLD,
+                 use_gpu: bool = True) -> None:
         """
-        :param labels_path: the path to labels file
-        :param config_path: the coco v3 config
-        :param weights_path: The coco v3 weights
+        :param yolo_folder: the yolo folder instance
         :param min_confidence: minimum probability to filter weak detections
         :param threshold: threshold when applying non-maxima suppression
         """
         super().__init__()
         # load the COCO class labels our YOLO model was trained on
-        self.labels_path = str(labels_path)
-        self.labels = Path(labels_path).read_text().strip().split("\n")
+        self.yolo_folder = yolo_folder
+        self.labels_path = str(yolo_folder.labels_file)
 
-        self.config_path = str(config_path)
-        self.weights_path = str(weights_path)
+        self.labels = self.yolo_folder.labels[:]
 
         self.min_confidence = min_confidence if min_confidence is not None else DEFAULT_CONFIDENCE
         self.threshold = threshold if threshold is not None else DEFAULT_THRESHOLD
@@ -47,28 +46,35 @@ class YoloDetector(object):
         np.random.seed(42)
         self.colors = np.random.randint(0, 255, size=(len(self.labels), 3), dtype="uint8")
 
-        # load our YOLO object detector trained on COCO dataset (80 classes)
-        logger.debug('loading YOLO from disk...')
-        self.net = cv2.dnn.readNetFromDarknet(self.config_path, self.weights_path)
+        self.net = self.yolo_folder.get_net(use_gpu=use_gpu)
 
     def __repr__(self) -> str:
-        return f"{self.__class__.__name__}(labels_path='{self.labels_path}', config_path='{self.config_path}', " \
-            f"weights_path='{self.weights_path}', min_confidence={self.min_confidence}, threshold={self.threshold})"
+        return f"{self.__class__.__name__}(yolo_folder='{self.yolo_folder}', " \
+            f"min_confidence={self.min_confidence}, threshold={self.threshold})"
 
     @staticmethod
-    def factory(yolo_coco_path: Union[str, Path] = None,
+    def factory(yolo: Union[str, Path] = 'v3',
                 min_confidence: float = None,
                 threshold: float = None):
-        yolo_coco_path = Path(yolo_coco_path) if yolo_coco_path else Path(__file__).parent / 'yolo-coco'
 
-        labels_path = yolo_coco_path / 'coco.names'
-        config_path = yolo_coco_path / 'yolov3.cfg'
-        weights_path = yolo_coco_path / 'yolov3.weights'
+        if isinstance(yolo, YoloFolder):
+            logger.debug(f'Using yolo folder: {yolo}')
+            yolo_folder = yolo
+        else:
+            if Path(yolo).exists():
+                logger.debug(f'Using yolo path: {yolo}')
+                yolo_folder_path = Path(yolo)
+            else:
+                assert yolo in yolo_detector_folders.keys(), f'got an invalid yolo argument: {yolo }\n' \
+                    f'Valid arguments are a yolo folder path or: {list(yolo_detector_folders.keys())}'
+                logger.debug(f'Using yolo: {yolo}')
+                yolo_folder_path = yolo_detector_folders[yolo]
 
-        assert all(p.exists() for p in [labels_path, config_path, weights_path])
-        return YoloDetector(labels_path, config_path, weights_path, min_confidence, threshold)
+            yolo_folder = YoloFolder(yolo_folder_path)
 
-    def detect_from_image_path(self, image_path, show=False):
+        return YoloDetector(yolo_folder, min_confidence, threshold)
+
+    def detect_from_image_path(self, image_path):
         image = cv2.imread(image_path)
         return self.detect(image)
 
@@ -94,7 +100,7 @@ class YoloDetector(object):
         blob = cv2.dnn.blobFromImage(image, 1 / 255.0, (416, 416), swapRB=True, crop=False)
         net.setInput(blob)
         start = time.time()
-        layerOutputs = net.forward(ln)
+        layer_outputs = net.forward(ln)
         end = time.time()
 
         # show timing information on YOLO
@@ -107,7 +113,7 @@ class YoloDetector(object):
         class_ids = []
 
         # loop over each of the layer outputs
-        for output in layerOutputs:
+        for output in layer_outputs:
             # loop over each of the detections
             for detection in output:
                 # extract the class ID and confidence (i.e., probability) of
@@ -165,8 +171,8 @@ class YoloDetector(object):
         return image
 
 
-def detect_gen():
-    detector = YoloDetector.factory()
+def detect_gen(yolo=None):
+    detector = YoloDetector.factory(yolo=yolo)
     while True:
         frame = yield
         yield detector.detect(frame)
@@ -176,7 +182,7 @@ def main():
     # construct the argument parse and parse the arguments
     ap = argparse.ArgumentParser()
     ap.add_argument("-i", "--image", required=True, help="path to input image")
-    ap.add_argument("-y", "--yolo", required=True, help="base path to YOLO directory")
+    ap.add_argument("-y", "--yolo", required=True, help="YOLO version or base path to YOLO directory")
     ap.add_argument("-c", "--confidence", type=float, default=DEFAULT_CONFIDENCE,
                     help="minimum probability to filter weak detections")
     ap.add_argument("-t", "--threshold", type=float, default=DEFAULT_THRESHOLD,
@@ -196,7 +202,7 @@ def main():
     detector = YoloDetector.factory(args.yolo, min_confidence=min_confidence, threshold=threshold)
     # detector = YoloDetector(labels_path, configPath, weightsPath, min_confidence, threshold)
     for curr_image in image_files:
-        detector.detect_from_image_path(str(curr_image), show=True)
+        detector.detect_from_image_path(str(curr_image))
         cv2.waitKey(0)
 
 
