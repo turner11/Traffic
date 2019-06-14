@@ -1,18 +1,14 @@
 import argparse
-import time
+from collections import namedtuple
+
 import pandas as pd
 import cv2
 import logging
-
 from settings.all_cameras import data as cameras_dict
-from yolo_object_detection import yolo
+from yolo_object_detection import yolo as yolo_api
 from utils import init_log
 
-
 logger = logging.getLogger(__name__)
-
-davrat_url = 'https://5c328052cb7f5.streamlock.net/live/DAVRAT.stream/playlist.m3u8'
-ahisemech_url = 'https://5c328052cb7f5.streamlock.net/live/AHISEMECH.stream/playlist.m3u8'
 
 
 def play(url, yolo_detector=None):
@@ -24,7 +20,7 @@ def play(url, yolo_detector=None):
     # Trained XML classifiers describes some features of some object we want to detect
     # car_cascade = cv2.CascadeClassifier('cars.xml')
 
-    detect_generator = yolo.detect_gen(yolo=yolo_detector)
+    detect_generator = yolo_api.detect_gen(yolo=yolo_detector)
     # next(detect_generator)
 
     # just for debugging
@@ -67,7 +63,6 @@ def play(url, yolo_detector=None):
 
         # Break the loop
 
-
     # When everything done, release the video capture object
     cap.release()
 
@@ -77,11 +72,11 @@ cv2.destroyAllWindows()
 
 
 def get_url(camera_id: int = None):
-    col_name, col_title, col_url = 'name', 'title', 'player_url_web'
-    all_camera_tpls = {i:(d['name'], d['title'], d['player_url_web']) for i, d in enumerate(cameras_dict)}
+    col_index, col_name, col_title, col_url = 'index', 'name', 'title', 'player_url_web'
+    CameraInfo = namedtuple('CameraInfo', [col_index, col_name, col_title, col_url])
+    all_cameras = [CameraInfo(i, d['name'], d['title'], d['player_url_web']) for i, d in enumerate(cameras_dict)]
 
-    df = pd.DataFrame(data=all_camera_tpls).transpose().rename(columns={0:col_name, 1:col_title, 2:col_url})
-
+    df = pd.DataFrame(all_cameras).set_index(col_index)
 
     if camera_id is None:
         print(df[[col_name, col_title]].to_string())
@@ -104,24 +99,19 @@ def get_url(camera_id: int = None):
     return url
 
 
-
-
 def main(camera_id=None, yolo=None):
     init_log()
     url = get_url(camera_id)
-    # url = ahisemech_url  #davrat_url
     play(url, yolo_detector=yolo)
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='')
     parser.add_argument('-c', dest='camera', help='the id of camera to use', required=False, default=None, type=int)
-    parser.add_argument("-y", "--yolo", required=False, help="YOLO version or base path to YOLO directory", default='v3')
+    parser.add_argument("-y", "--yolo", required=False, help="YOLO version or base path to YOLO directory",
+                        default='v3')
     args = parser.parse_args()
 
-    camera_id = args.camera#args.camera if args.camera >= 0 else None
-    yolo_detector = args.yolo
-    main(camera_id=camera_id, yolo=yolo_detector)
-
-
-
+    camera_id_arg = args.camera  # args.camera if args.camera >= 0 else None
+    yolo_detector_arg = args.yolo
+    main(camera_id=camera_id_arg, yolo=yolo_detector_arg)
