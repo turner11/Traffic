@@ -8,6 +8,12 @@ _colors = iter(np.random.randint(0, 255, size=(max_label_count, 3), dtype="uint8
 color_by_label = {}
 
 
+def draw_detections(frame, detections):
+    for detection in detections:
+        frame = draw_detection(frame, detection)
+    return frame
+
+
 def draw_detection(frame, detection):
     """
     draw a bounding box rectangle and label on the image

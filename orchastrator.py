@@ -5,12 +5,13 @@ import rx
 from rx import operators as op
 import logging
 from imutils.video import FPS
-
+from detection_handlers.detection_drawer import draw_detections
 from trackers.opencv_tracker import OpenCvTracker
 from yolo_detectors.yolo_detector import YoloDetector
 
 logger = logging.getLogger(__name__)
 KeyAndFrame = namedtuple('KeyAndFrame', ['key', 'frame'])
+KeyFrameDetections = namedtuple('KeyAndFrame', ['key', 'frame','detections'])
 
 
 class Orchestrator(object):
@@ -90,11 +91,12 @@ class Orchestrator(object):
             return KeyAndFrame(key_and_frame.key, frame)
 
         composed = source.pipe(
-            op.map(lambda kf: KeyAndFrame(kf.key, detector.detect(kf.frame))),
-            op.map(track),
+            op.map(lambda kf: KeyFrameDetections(kf.key, kf.frame, detector.detect(kf.frame))),
+            op.map(lambda kfd: KeyFrameDetections(kfd.key, draw_detections(kfd.frame, kfd.detections), kfd.detections)),
+            op.map(lambda kfd: track(KeyAndFrame(kfd.key,kfd.frame))),
         )
 
-        composed.subscribe(on_next=lambda kf: cv2.imshow('Boxed Frames', kf.frame),
+        composed.subscribe(on_next=lambda kf: cv2.imshow(f'Traffic: {self.yolo}', kf.frame),
                            on_completed=lambda: logger.debug("Stream ended"),
                            on_error=lambda e: logger.exception('Got on error'))
 
