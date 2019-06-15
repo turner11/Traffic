@@ -7,14 +7,13 @@ import logging
 from imutils.video import FPS
 
 from trackers.opencv_tracker import OpenCvTracker
-from utils import init_log
-from yolo_object_detection.yolo import YoloDetector
+from yolo_detectors.yolo import YoloDetector
 
 logger = logging.getLogger(__name__)
 KeyAndFrame = namedtuple('KeyAndFrame', ['key', 'frame'])
 
 
-class Orchstrator(object):
+class Orchestrator(object):
     """"""
 
     def __init__(self, url, yolo):
@@ -62,6 +61,7 @@ class Orchstrator(object):
     def start(self):
         url = self.url
         source_func = partial(self.get_stream, url)
+        # noinspection PyTypeChecker
         source = rx.create(source_func)
 
         detector = YoloDetector.factory(yolo=self.yolo)

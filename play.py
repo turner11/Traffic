@@ -2,7 +2,7 @@ import argparse
 from collections import namedtuple
 import pandas as pd
 import logging
-from orchastrator import Orchstrator
+from orchastrator import Orchestrator
 from settings.all_cameras import data as cameras_dict
 from utils import init_log
 
@@ -41,7 +41,7 @@ def main(camera_id=None, yolo=None):
     init_log()
     url = get_url(camera_id)
     # play(url, yolo_detector=yolo)
-    orch = Orchstrator(url=url, yolo=yolo)
+    orch = Orchestrator(url=url, yolo=yolo)
     orch.start()
 
 
