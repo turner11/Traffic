@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "7585b1c8f7eeaefb320b5aaf0b8c54f6770f5071b9dcd91cf1a35cb2976ed6ac"
+            "sha256": "a97526c4de1e9bd832e49ba4da044df4366ccfec85a6b7a148908d2fe934e055"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -73,6 +73,12 @@
                 "sha256:33ee8ceb63f1db61cce8b5c800c531e1a61023ac5488ccde2ba574a85be00a85"
             ],
             "version": "==4.18"
+        },
+        "icdiff": {
+            "hashes": [
+                "sha256:66972dd03318da55280991db375d3ef6b66d948c67af96c1ebdb21587e86655e"
+            ],
+            "version": "==1.9.1"
         },
         "idna": {
             "hashes": [
@@ -286,6 +292,13 @@
             ],
             "version": "==0.12.0"
         },
+        "pprintpp": {
+            "hashes": [
+                "sha256:b6b4dcdd0c0c0d75e4d7b2f21a9e933e5b2ce62b26e1a54537f9651ae5a5c01d",
+                "sha256:ea826108e2c7f49dc6d66c752973c3fc9749142a798d6b254e1e301cfdbc6403"
+            ],
+            "version": "==0.4.0"
+        },
         "py": {
             "hashes": [
                 "sha256:64f65755aee5b381cea27766a3a147c3f15b9b6b9ac88676de66ba2ae36793fa",
@@ -314,6 +327,13 @@
             ],
             "index": "pypi",
             "version": "==4.6.3"
+        },
+        "pytest-icdiff": {
+            "hashes": [
+                "sha256:9ff97fb493085f8099a8a7f6161fd570fad96699f42dc08ffc66d04e8063862f"
+            ],
+            "index": "pypi",
+            "version": "==0.2"
         },
         "python-dateutil": {
             "hashes": [
