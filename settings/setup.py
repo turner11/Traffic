@@ -1,18 +1,19 @@
 import logging
+from collections import namedtuple
 from pathlib import Path
-
 import requests
 from tqdm import tqdm
-
-from settings.user_settings import data_root_path
 from utils import init_log
-from settings.constants import car_images_url
+from yolo_detectors.configurations import yolo_detector_folders
+DownloadData = namedtuple('DownloadData', ['name', 'url', 'destination'])
+
+
 
 logger = logging.getLogger(__name__)
 
-def download(url, dest):
-    logger.debug(f'Downloading from "{url}" to {dest}')
-    with open(dest, 'wb') as f:
+
+def download(url, destination):
+    with open(str(destination), 'wb') as f:
         response = requests.get(url, stream=True)
 
         # Retrieve HTTP meta-data
@@ -31,24 +32,25 @@ def download(url, dest):
                 pbar.update(len(data))
 
 
-def get_cars_data():
-
+def get_yolo_weights():
     # url = 'http://i3.ytimg.com/vi/J---aiyznGQ/mqdefault.jpg'
-    root = Path(data_root_path)
-    root.mkdir(parents=True, exist_ok=True)
-    images_download_path = root / 'car_ims.tgz'
-    if not images_download_path.exists():
-        download(car_images_url, images_download_path)
-    else:
-        logger.info('car zip file already exists. Skipping download.')
+
+    v2_data = DownloadData('v2','https://pjreddie.com/media/files/yolov2.weights', yolo_detector_folders['v2']/'yolov2.weights')
+    v3_data = DownloadData('v3', 'https://pjreddie.com/media/files/yolov3.weights', yolo_detector_folders['v3'] / 'yolov3.weights')
+    v3_tiny_data = DownloadData('v3_tiny', 'https://pjreddie.com/media/files/yolov3-tiny.weights', yolo_detector_folders['v3_tiny'] / 'yolov3-tiny.weights')
 
 
+    for download_data in [v2_data, v3_tiny_data, v3_data]:
+        if not download_data.destination.exists():
+            logger.info(f'Downloading {download_data.name}. From "{download_data.url}" to {download_data.destination}')
+            download(download_data.url, download_data.destination)
+        else:
+            logger.info('car zip file already exists. Skipping download.')
 
 
 def main():
     init_log()
-    get_cars_data()
-
+    get_yolo_weights()
 
 
 if __name__ == '__main__':
