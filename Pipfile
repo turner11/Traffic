@@ -22,6 +22,7 @@ pytest = "*"
 opencv-contrib-python = "*"
 pip = "*"
 rx = "==3.0.0b4"
+pytest-icdiff = "*"
 
 [requires]
 python_version = "3.6"
