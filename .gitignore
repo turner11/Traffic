@@ -4,3 +4,5 @@
 yolo_detectors/videos/*
 yolo_detectors/output/*
 
+traffic_logs/*
+yolo_detectors/*/*.weights

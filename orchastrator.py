@@ -7,7 +7,7 @@ import logging
 from imutils.video import FPS
 
 from trackers.opencv_tracker import OpenCvTracker
-from yolo_detectors.yolo import YoloDetector
+from yolo_detectors.yolo_detector import YoloDetector
 
 logger = logging.getLogger(__name__)
 KeyAndFrame = namedtuple('KeyAndFrame', ['key', 'frame'])

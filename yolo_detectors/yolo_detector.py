@@ -1,25 +1,22 @@
-# https://www.pyimagesearch.com/2018/11/12/yolo-object-detection-with-opencv/
-# USAGE
-# python yolo.py --image images/baggage_claim.jpg --yolo yolo-coco
+from collections import namedtuple
 from pathlib import Path
 from typing import Union
-
 import numpy as np
 import argparse
 import time
 import cv2
-
 import logging
-
 from yolo_detectors.configurations import yolo_detector_folders
 from yolo_detectors.yolo_config_folder import YoloFolder
 
+Detection = namedtuple('Detection', ['label', 'confidence', 'x', 'y', 'w', 'h'])
 logger = logging.getLogger(__name__)
 
 DEFAULT_CONFIDENCE = 0.5
 DEFAULT_THRESHOLD = 0.3
 
 
+# https://www.pyimagesearch.com/2018/11/12/yolo-object-detection-with-opencv/
 class YoloDetector(object):
     """"""
 
@@ -42,10 +39,6 @@ class YoloDetector(object):
         self.min_confidence = min_confidence if min_confidence is not None else DEFAULT_CONFIDENCE
         self.threshold = threshold if threshold is not None else DEFAULT_THRESHOLD
 
-        # initialize a list of colors to represent each possible class label
-        np.random.seed(42)
-        self.colors = np.random.randint(0, 255, size=(len(self.labels), 3), dtype="uint8")
-
         self.net = self.yolo_folder.get_net(use_gpu=use_gpu)
 
     def __repr__(self) -> str:
@@ -65,7 +58,7 @@ class YoloDetector(object):
                 logger.debug(f'Using yolo path: {yolo}')
                 yolo_folder_path = Path(yolo)
             else:
-                assert yolo in yolo_detector_folders.keys(), f'got an invalid yolo argument: {yolo }\n' \
+                assert yolo in yolo_detector_folders.keys(), f'got an invalid yolo argument: {yolo}\n' \
                     f'Valid arguments are a yolo folder path or: {list(yolo_detector_folders.keys())}'
                 logger.debug(f'Using yolo: {yolo}')
                 yolo_folder_path = yolo_detector_folders[yolo]
@@ -75,16 +68,15 @@ class YoloDetector(object):
         return YoloDetector(yolo_folder, min_confidence, threshold)
 
     def detect_from_image_path(self, image_path):
-        image = cv2.imread(image_path)
+        image = cv2.imread(str(image_path))
         return self.detect(image)
 
-    def detect(self, image, show=False):
+    def detect(self, image):
         # load our input image and grab its spatial dimensions
         min_confidence = self.min_confidence
         threshold = self.threshold
         net = self.net
 
-        colors = self.colors
         labels = self.labels
 
         (H, W) = image.shape[:2]
@@ -146,9 +138,9 @@ class YoloDetector(object):
 
         # apply non-maxima suppression to suppress weak, overlapping bounding
         # boxes
-
         idxs = cv2.dnn.NMSBoxes(boxes, confidences, min_confidence, threshold)
 
+        detections = []
         # ensure at least one detection exists
         if len(idxs) > 0:
             # loop over the indexes we are keeping
@@ -157,18 +149,13 @@ class YoloDetector(object):
                 (x, y) = (boxes[i][0], boxes[i][1])
                 (w, h) = (boxes[i][2], boxes[i][3])
 
-                # draw a bounding box rectangle and label on the image
-                color = [int(c) for c in colors[class_ids[i]]]
-                cv2.rectangle(image, (x, y), (x + w, y + h), color, 2)
                 class_id = class_ids[i]
                 label = labels[class_id]
-                text = "{}: {:.4f}".format(label, confidences[i])
-                cv2.putText(image, text, (x, y - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
+                confidence = confidences[i]
+                detection = Detection(label, confidence, x, y, w, h)
+                detections.append(detection)
 
-        # show the output image
-        if show:
-            cv2.imshow("Image", image)
-        return image
+        return detections
 
 
 def detect_gen(yolo=None):
@@ -186,7 +173,7 @@ def main():
     ap.add_argument("-c", "--confidence", type=float, default=DEFAULT_CONFIDENCE,
                     help="minimum probability to filter weak detections")
     ap.add_argument("-t", "--threshold", type=float, default=DEFAULT_THRESHOLD,
-                    help="threshold when applyong non-maxima suppression")
+                    help="threshold when applying non-maxima suppression")
 
     args = ap.parse_args()
 
