@@ -28,12 +28,21 @@ cd path/to/repo
 python play.py
 ```
 
-You will be asked to choose a camera from a list. You can also pass the camera as an argument:
+You will be asked to choose a camera from a list.
+
+You can also pass the camera as an argument:
 ```
 cd path/to/repo
 python play.py -c 70
 ```
 
-#### Commands:
-*s* - For tracking a specific region of interest.  
-*q* - For closing the window.  
+Or specify location of an existing local video file:
+```
+cd path/to/repo
+python play.py -c /path/to/video/file.avi
+```
+
+#### Commands
+While viewing the stream, the following commands are available:  
+**s** - For tracking a specific region of interest.  
+**q** - For closing the window.  
