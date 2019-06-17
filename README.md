@@ -2,6 +2,8 @@
 
 A demonstration of connecting to real life traffic camers and monitoring traffic (detection + tracking).  
 
+![](media/example.gif)
+
 ## Main Dependencies
 1. [open cv](https://github.com/skvark/opencv-python)
 2. [yolo](https://pjreddie.com/darknet/yolo/)
