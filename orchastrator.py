@@ -69,10 +69,13 @@ class Orchestrator(object):
         from commands.detect_command import DetectCommand
         from commands.draw_bonding_box_command import DrawBoundingBoxCommand
         from commands.track_command import TrackCommand
+        from commands.draw_stats_command import DrawStatsCommand
         from commands.save_frame_command import SaveFrameCommand
         cmd_detect = DetectCommand(detector=detector)
         cmd_draw = DrawBoundingBoxCommand()
         cmd_track = TrackCommand(tracker)
+
+        cmd_stats = DrawStatsCommand(additional_info={"Tracker": tracker.tracker})
 
         # fn = r'out_video.avi'
         # fourcc = cv2.VideoWriter_fourcc(*"MJPG")
@@ -83,6 +86,7 @@ class Orchestrator(object):
             op.map(lambda kf: KeyFrameDetections(kf.key, kf.frame, cmd_detect(kf))),
             op.map(lambda kfd: KeyFrameDetections(kfd.key, cmd_draw(kfd), kfd.detections)),
             op.map(lambda kfd: KeyAndFrame(kfd.key, cmd_track(kfd))),
+            op.map(lambda kfd: KeyAndFrame(kfd.key, cmd_stats(kfd)))
             # op.map(cmd_save)
         )
 
