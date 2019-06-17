@@ -9,7 +9,7 @@ import logging
 from common.exceptions import ArgumentException
 from orchastrator import Orchestrator
 from settings.all_cameras import data as cameras_dict
-from utils import init_log
+from common.utils import init_log
 
 logger = logging.getLogger(__name__)
 

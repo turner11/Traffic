@@ -1,9 +1,8 @@
 import logging
 from collections import namedtuple
-from pathlib import Path
 import requests
 from tqdm import tqdm
-from utils import init_log
+from common.utils import init_log
 from yolo_detectors.configurations import yolo_detector_folders
 DownloadData = namedtuple('DownloadData', ['name', 'url', 'destination'])
 
