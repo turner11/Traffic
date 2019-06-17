@@ -5,6 +5,8 @@ import rx
 from rx import operators as op
 import logging
 from imutils.video import FPS
+
+from commands.show_command import ShowCommand
 from trackers.opencv_tracker import OpenCvTracker
 from yolo_detectors.yolo_detector import YoloDetector
 
@@ -76,6 +78,7 @@ class Orchestrator(object):
         cmd_track = TrackCommand(tracker)
 
         cmd_stats = DrawStatsCommand(additional_info={"Tracker": tracker.tracker})
+        cmd_show = ShowCommand(title=f'Traffic: {self.yolo}')
 
         # fn = r'out_video.avi'
         # fourcc = cv2.VideoWriter_fourcc(*"MJPG")
@@ -86,10 +89,13 @@ class Orchestrator(object):
             op.map(lambda kf: KeyFrameDetections(kf.key, kf.frame, cmd_detect(kf))),
             op.map(lambda kfd: KeyFrameDetections(kfd.key, cmd_draw(kfd), kfd.detections)),
             op.map(lambda kfd: KeyAndFrame(kfd.key, cmd_track(kfd))),
-            op.map(lambda kfd: KeyAndFrame(kfd.key, cmd_stats(kfd)))
-            # op.map(cmd_save)
+            op.map(lambda kfd: KeyAndFrame(kfd.key, cmd_stats(kfd))),
+            op.map(cmd_show),
+            # op.map(cmd_save),
+
         )
 
-        composed.subscribe(on_next=lambda kf: cv2.imshow(f'Traffic: {self.yolo}', kf.frame),
+        composed.subscribe(on_next=lambda kf: kf,
                            on_completed=lambda: logger.debug("Stream ended"),
                            on_error=lambda e: logger.exception('Got on error'))
+        # video_writer.release()
