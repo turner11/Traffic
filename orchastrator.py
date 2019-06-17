@@ -5,13 +5,12 @@ import rx
 from rx import operators as op
 import logging
 from imutils.video import FPS
-from detection_handlers.detection_drawer import draw_detections
 from trackers.opencv_tracker import OpenCvTracker
 from yolo_detectors.yolo_detector import YoloDetector
 
 logger = logging.getLogger(__name__)
 KeyAndFrame = namedtuple('KeyAndFrame', ['key', 'frame'])
-KeyFrameDetections = namedtuple('KeyAndFrame', ['key', 'frame','detections'])
+KeyFrameDetections = namedtuple('KeyAndFrame', ['key', 'frame', 'detections'])
 
 
 class Orchestrator(object):
@@ -22,8 +21,6 @@ class Orchestrator(object):
         super().__init__()
         self.url = url
         self.yolo = yolo
-
-        self._should_track = False
 
     def __repr__(self):
         return super().__repr__()
@@ -52,6 +49,7 @@ class Orchestrator(object):
                     observer.on_next(KeyAndFrame(key, raw_frame))
                 else:
                     observer.on_error('Failed to read video capture')
+                    observer.on_completed()
                     break
         finally:
             cap.release()
@@ -68,36 +66,26 @@ class Orchestrator(object):
         detector = YoloDetector.factory(yolo=self.yolo)
         tracker = OpenCvTracker()
 
-        def track(key_and_frame):
-            should_reset = False
-            if key_and_frame.key == 's':
-                if self._should_track:
-                    should_reset = True
+        from commands.detect_command import DetectCommand
+        from commands.draw_bonding_box_command import DrawBoundingBoxCommand
+        from commands.track_command import TrackCommand
+        from commands.save_frame_command import SaveFrameCommand
+        cmd_detect = DetectCommand(detector=detector)
+        cmd_draw = DrawBoundingBoxCommand()
+        cmd_track = TrackCommand(tracker)
 
-                self._should_track = not self._should_track
-
-
-            if self._should_track:
-                is_success , frame = tracker.track(key_and_frame.frame)
-                should_reset = not is_success
-            else:
-                frame = key_and_frame.frame
-
-            if should_reset:
-                frame = key_and_frame.frame
-                self._should_track = False
-                tracker.reset()
-
-            return KeyAndFrame(key_and_frame.key, frame)
+        # fn = r'out_video.avi'
+        # fourcc = cv2.VideoWriter_fourcc(*"MJPG")
+        # video_writer = cv2.VideoWriter(fn, fourcc, 14, (720, 576), True)
+        # cmd_save = SaveFrameCommand(video_writer=video_writer)
 
         composed = source.pipe(
-            op.map(lambda kf: KeyFrameDetections(kf.key, kf.frame, detector.detect(kf.frame))),
-            op.map(lambda kfd: KeyFrameDetections(kfd.key, draw_detections(kfd.frame, kfd.detections), kfd.detections)),
-            op.map(lambda kfd: track(KeyAndFrame(kfd.key,kfd.frame))),
+            op.map(lambda kf: KeyFrameDetections(kf.key, kf.frame, cmd_detect(kf))),
+            op.map(lambda kfd: KeyFrameDetections(kfd.key, cmd_draw(kfd), kfd.detections)),
+            op.map(lambda kfd: KeyAndFrame(kfd.key, cmd_track(kfd))),
+            # op.map(cmd_save)
         )
 
         composed.subscribe(on_next=lambda kf: cv2.imshow(f'Traffic: {self.yolo}', kf.frame),
                            on_completed=lambda: logger.debug("Stream ended"),
                            on_error=lambda e: logger.exception('Got on error'))
-
-

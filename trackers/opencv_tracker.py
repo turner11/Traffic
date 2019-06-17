@@ -35,7 +35,9 @@ class OpenCvTracker(object):
         tracker = self.tracker_instance
 
         if not self.started_tracking:
-            init_bounding_box = cv2.selectROI("Frame", frame, fromCenter=False, showCrosshair=True)
+            window_name = 'set tracking area'
+            init_bounding_box = cv2.selectROI(window_name, frame, fromCenter=False, showCrosshair=True)
+            cv2.destroyWindow(window_name)
             tracker.init(frame, init_bounding_box)
             self.started_tracking = True
             self.fps = FPS().start()
