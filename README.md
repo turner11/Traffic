@@ -23,7 +23,7 @@ cd path/to/repo
 pipenv install 
 ```
 
-For downloading pre trained yolo weights run the[setup.py](https://github.com/turner11/Traffic/blob/master/settings/setup.py)
+For downloading pre trained yolo weights run the [setup.py](https://github.com/turner11/Traffic/blob/master/settings/setup.py)
 
 ## Code execution:
 For running the code run [play.py](https://github.com/turner11/Traffic/blob/master/play.py)
