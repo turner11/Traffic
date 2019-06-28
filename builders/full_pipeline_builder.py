@@ -12,7 +12,7 @@ from commands.draw_stats_command import DrawStatsCommand
 class FullPipelineBuilder(RunTimePipelineBuilder):
     """"""
 
-    def __init__(self, window_title='Traffic', detector=None, tracker=None, **args):
+    def __init__(self, detector=None, tracker=None, **args):
         """"""
         self.detector = detector or YoloDetector.factory(yolo=args.get('yolo'))
         self.tracker = tracker or OpenCvTracker()
