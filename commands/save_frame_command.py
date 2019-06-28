@@ -1,6 +1,6 @@
 import cv2
-
 from commands.abstract_command import FrameCommand
+from common import layers
 
 
 class SaveFrameCommand(FrameCommand):
@@ -17,13 +17,17 @@ class SaveFrameCommand(FrameCommand):
     >>> video_writer.release()
     """
 
+
     def __init__(self, video_writer):
         """"""
         super().__init__()
         self.video_writer = video_writer
 
+    @classmethod
+    def get_layer_type(cls):
+        return layers.OutPut.FILE
+
     def execute(self, frame_container):
         frame = frame_container.frame
-        self.video_writer.write(frame )
+        self.video_writer.write(frame)
         return frame
-

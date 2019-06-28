@@ -62,40 +62,15 @@ class Orchestrator(object):
     def start(self):
         url = self.url
         source_func = partial(self.get_stream, url)
-        # noinspection PyTypeChecker
-        source = rx.create(source_func)
 
-        detector = YoloDetector.factory(yolo=self.yolo)
-        tracker = OpenCvTracker()
+        from builders.pipeline_director import PipelineDirector
+        from builders.visual_pipeline_builder import VisualPipelineBuilder
 
-        from commands.detect_command import DetectCommand
-        from commands.draw_bonding_box_command import DrawBoundingBoxCommand
-        from commands.track_command import TrackCommand
-        from commands.draw_stats_command import DrawStatsCommand
-        from commands.save_frame_command import SaveFrameCommand
-        cmd_detect = DetectCommand(detector=detector)
-        cmd_draw = DrawBoundingBoxCommand()
-        cmd_track = TrackCommand(tracker)
+        builder = VisualPipelineBuilder()
+        director = PipelineDirector(builder)
+        pipeline = director.build(source_func)
 
-        cmd_stats = DrawStatsCommand(additional_info={"Tracker": tracker.tracker})
-        cmd_show = ShowCommand(title=f'Traffic: {self.yolo}')
-
-        # fn = r'out_video.avi'
-        # fourcc = cv2.VideoWriter_fourcc(*"MJPG")
-        # video_writer = cv2.VideoWriter(fn, fourcc, 14, (720, 576), True)
-        # cmd_save = SaveFrameCommand(video_writer=video_writer)
-
-        composed = source.pipe(
-            op.map(lambda kf: KeyFrameDetections(kf.key, kf.frame, cmd_detect(kf))),
-            op.map(lambda kfd: KeyFrameDetections(kfd.key, cmd_draw(kfd), kfd.detections)),
-            op.map(lambda kfd: KeyAndFrame(kfd.key, cmd_track(kfd))),
-            op.map(lambda kfd: KeyAndFrame(kfd.key, cmd_stats(kfd))),
-            op.map(cmd_show),
-            # op.map(cmd_save),
-
-        )
-
-        composed.subscribe(on_next=lambda kf: kf,
+        pipeline.subscribe(on_next=lambda kf: kf,
                            on_completed=lambda: logger.debug("Stream ended"),
                            on_error=lambda e: logger.exception('Got on error'))
         # video_writer.release()

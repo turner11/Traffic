@@ -1,14 +1,20 @@
 from commands.abstract_command import FrameCommand
+from common import layers
 
 
 class TrackCommand(FrameCommand):
     """"""
+
 
     def __init__(self, tracker=None):
         """"""
         super().__init__()
         self.tracker = tracker
         self._should_track = False
+
+    @classmethod
+    def get_layer_type(cls):
+        return layers.RawDataProcessing.TRACKING
 
     def execute(self, key_and_frame):
         tracker = self.tracker

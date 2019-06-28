@@ -1,10 +1,12 @@
 import cv2
 from imutils.video import FPS
 from commands.abstract_command import FrameCommand
+from common import layers
 
 
 class DrawStatsCommand(FrameCommand):
     """"""
+
 
     def __init__(self, additional_info: dict = None):
         """
@@ -14,6 +16,10 @@ class DrawStatsCommand(FrameCommand):
         self.fps = None
         self.additional_info = additional_info or {}
         self.started = False
+
+    @classmethod
+    def get_layer_type(cls):
+        return layers.Augmentation.STATISTICS
 
     def execute(self, frame_container):
         frame = frame_container.frame
