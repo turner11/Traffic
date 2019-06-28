@@ -2,14 +2,14 @@ import cv2
 from imutils.video import FPS
 
 OPENCV_OBJECT_TRACKERS = {
-        'csrt': cv2.TrackerCSRT_create,
-        'mosse': cv2.TrackerMOSSE_create,
-        'kcf': cv2.TrackerKCF_create,
-        'boosting': cv2.TrackerBoosting_create,
-        'mil': cv2.TrackerMIL_create,
-        'tld': cv2.TrackerTLD_create,
-        'medianflow': cv2.TrackerMedianFlow_create,
-    }
+    'csrt': cv2.TrackerCSRT_create,
+    'mosse': cv2.TrackerMOSSE_create,
+    'kcf': cv2.TrackerKCF_create,
+    'boosting': cv2.TrackerBoosting_create,
+    'mil': cv2.TrackerMIL_create,
+    'tld': cv2.TrackerTLD_create,
+    'medianflow': cv2.TrackerMedianFlow_create,
+}
 
 
 class OpenCvTracker(object):
@@ -21,7 +21,6 @@ class OpenCvTracker(object):
         self.tracker = tracker
         self.tracker_instance = self._get_tracker(tracker)
         self.started_tracking = False
-
 
     def _get_tracker(self, tracker):
         ctor = OPENCV_OBJECT_TRACKERS[tracker]
@@ -38,11 +37,11 @@ class OpenCvTracker(object):
             window_name = 'set tracking area'
             init_bounding_box = cv2.selectROI(window_name, frame, fromCenter=False, showCrosshair=True)
             cv2.destroyWindow(window_name)
-            if any(v != 0 for v in init_bounding_box):
+
+            has_bounding_box = any(v != 0 for v in init_bounding_box)
+            if has_bounding_box:
                 tracker.init(frame, init_bounding_box)
                 self.started_tracking = True
-
-
 
         # grab the new bounding box coordinates of the object
         (success, box) = tracker.update(frame)
@@ -58,5 +57,3 @@ class OpenCvTracker(object):
         self.tracker_instance = self._get_tracker(self.tracker)
         self.started_tracking = None
         self.fps = None
-
-
