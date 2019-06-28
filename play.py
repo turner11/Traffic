@@ -59,6 +59,8 @@ def main(camera_id=None, yolo=None):
     url, title = get_url(camera_id)
 
     builder = FullPipelineBuilder(yolo=yolo)
+    # from builders.debug_pipeline_builder import DebugPipelineBuilder
+    # builder = DebugPipelineBuilder(yolo=yolo)
     director = PipelineDirector(builder)
     pipeline = director.build(url)
 

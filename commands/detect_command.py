@@ -6,7 +6,7 @@ class DetectCommand(FrameCommand):
 
     def __init__(self, detector):
         """"""
-        super().__init__('d')
+        super().__init__(toggle_key='d')
         self.detector = detector
 
     def _execute(self, payload):

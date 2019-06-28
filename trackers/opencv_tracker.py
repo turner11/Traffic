@@ -1,6 +1,4 @@
 import cv2
-from imutils.video import FPS
-
 OPENCV_OBJECT_TRACKERS = {
     'csrt': cv2.TrackerCSRT_create,
     'mosse': cv2.TrackerMOSSE_create,
@@ -11,6 +9,10 @@ OPENCV_OBJECT_TRACKERS = {
     'medianflow': cv2.TrackerMedianFlow_create,
 }
 
+# KCF: Fast and accurate
+# CSRT: More accurate than KCF but slower
+# MOSSE: Extremely fast but not as accurate as either KCF or CSRT
+
 
 class OpenCvTracker(object):
     """"""
@@ -19,7 +21,7 @@ class OpenCvTracker(object):
         """"""
         super().__init__()
         self.tracker = tracker
-        self.tracker_instance = self._get_tracker(tracker)
+        self.multi_tracker = cv2.MultiTracker_create()
         self.started_tracking = False
 
     def _get_tracker(self, tracker):
@@ -31,29 +33,27 @@ class OpenCvTracker(object):
         return f'{self.__class__.__name__}(tracker={self.tracker})'
 
     def track(self, frame) -> (object, bool):
-        tracker = self.tracker_instance
+        trackers = self.multi_tracker
 
-        if not self.started_tracking:
-            window_name = 'set tracking area'
-            init_bounding_box = cv2.selectROI(window_name, frame, fromCenter=False, showCrosshair=True)
-            cv2.destroyWindow(window_name)
-
-            has_bounding_box = any(v != 0 for v in init_bounding_box)
-            if has_bounding_box:
-                tracker.init(frame, init_bounding_box)
-                self.started_tracking = True
-
-        # grab the new bounding box coordinates of the object
-        (success, box) = tracker.update(frame)
+        # grab the new bounding box coordinates of the objects
+        (success, boxes) = trackers.update(frame)
 
         # check to see if the tracking was a success
         if success:
-            (x, y, w, h) = [int(v) for v in box]
-            cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
+            for box in boxes:
+                (x, y, w, h) = [int(v) for v in box]
+                cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 1)
+        else:
+            self.reset()
 
         return success, frame
 
+    def add_tracker(self, frame, init_bounding_box):
+        tracker = self._get_tracker(self.tracker)
+        self.multi_tracker.add(tracker, frame, init_bounding_box)
+        self.started_tracking = True
+
     def reset(self):
-        self.tracker_instance = self._get_tracker(self.tracker)
-        self.started_tracking = None
+        self.multi_tracker.clear()
+        self.started_tracking = False
         self.fps = None

@@ -12,7 +12,7 @@ class DrawStatsCommand(FrameCommand):
         """
         :param additional_info: additional info to show
         """
-        super().__init__('s')
+        super().__init__(toggle_key='s')
         self.fps = None
         self.additional_info = additional_info or {}
         self.started = False
