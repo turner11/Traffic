@@ -7,7 +7,7 @@ import pandas as pd
 import logging
 
 from common.exceptions import ArgumentException
-from observers.showobserver import ShowObserver
+from observers.show_observer import ShowObserver
 from settings.all_cameras import data as cameras_dict
 from builders.pipeline_director import PipelineDirector
 from builders.full_pipeline_builder import FullPipelineBuilder
@@ -63,6 +63,7 @@ def main(camera_id=None, yolo=None):
     pipeline = director.build(url)
 
     pipeline.subscribe(ShowObserver(title))
+    # pipeline.subscribe(SaveObserver(path='...', title=title))
 
 
 if __name__ == '__main__':
