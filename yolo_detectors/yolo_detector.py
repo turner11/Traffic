@@ -96,7 +96,7 @@ class YoloDetector(object):
         end = time.time()
 
         # show timing information on YOLO
-        logger.debug("YOLO took {:.6f} seconds".format(end - start))
+        # logger.debug("YOLO took {:.6f} seconds".format(end - start))
 
         # initialize our lists of detected bounding boxes, confidences, and
         # class IDs, respectively

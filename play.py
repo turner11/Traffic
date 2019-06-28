@@ -7,9 +7,10 @@ import pandas as pd
 import logging
 
 from common.exceptions import ArgumentException
+from observers.showobserver import ShowObserver
 from settings.all_cameras import data as cameras_dict
 from builders.pipeline_director import PipelineDirector
-from builders.visual_pipeline_builder import VisualPipelineBuilder
+from builders.full_pipeline_builder import FullPipelineBuilder
 from common.utils import init_log
 
 logger = logging.getLogger(__name__)
@@ -57,14 +58,11 @@ def main(camera_id=None, yolo=None):
     init_log()
     url, title = get_url(camera_id)
 
-    builder = VisualPipelineBuilder(window_title=title)
+    builder = FullPipelineBuilder(window_title=title, yolo=yolo)
     director = PipelineDirector(builder)
     pipeline = director.build(url)
 
-    pipeline.subscribe(on_next=lambda payload: payload,
-                       on_completed=lambda: logger.info("Stream ended"),
-                       on_error=lambda e: logger.exception('Got on error'))
-
+    pipeline.subscribe(ShowObserver(title))
 
 
 if __name__ == '__main__':

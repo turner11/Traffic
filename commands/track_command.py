@@ -22,3 +22,6 @@ class TrackCommand(FrameCommand):
 
         payload.frame = frame
         return payload
+
+    def _is_on_changed(self, is_on):
+        self.tracker.reset()

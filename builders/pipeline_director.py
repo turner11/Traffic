@@ -48,9 +48,6 @@ class PipelineDirector(object):
                     observer.on_error('Failed to read video capture')
                     observer.on_completed()
                     break
-        except Exception as ex:
-            observer.on_error(f"Got an error: {ex}")
-            raise
         finally:
             cap.release()
             cv2.destroyAllWindows()

@@ -38,8 +38,9 @@ class OpenCvTracker(object):
             window_name = 'set tracking area'
             init_bounding_box = cv2.selectROI(window_name, frame, fromCenter=False, showCrosshair=True)
             cv2.destroyWindow(window_name)
-            tracker.init(frame, init_bounding_box)
-            self.started_tracking = True
+            if any(v != 0 for v in init_bounding_box):
+                tracker.init(frame, init_bounding_box)
+                self.started_tracking = True
 
 
 
