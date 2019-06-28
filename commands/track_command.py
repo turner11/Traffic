@@ -1,39 +1,24 @@
 from commands.abstract_command import FrameCommand
-from common import layers
 
 
 class TrackCommand(FrameCommand):
     """"""
 
-
     def __init__(self, tracker=None):
         """"""
-        super().__init__()
+        super().__init__(toggle_key='t')
+        self._is_on = False
         self.tracker = tracker
-        self._should_track = False
 
-    @classmethod
-    def get_layer_type(cls):
-        return layers.RawDataProcessing.TRACKING
-
-    def execute(self, key_and_frame):
+    def _execute(self, payload):
         tracker = self.tracker
-        should_reset = False
-        if key_and_frame.key == 's':
-            if self._should_track:
-                should_reset = True
+        is_success, frame = tracker.track(payload.frame)
 
-            self._should_track = not self._should_track
-
-        if self._should_track:
-            is_success, frame = tracker.track(key_and_frame.frame)
-            should_reset = not is_success
-        else:
-            frame = key_and_frame.frame
-
+        should_reset = not is_success
         if should_reset:
-            frame = key_and_frame.frame
-            self._should_track = False
+            frame = payload.frame
+            self._is_on = False
             tracker.reset()
 
-        return frame
+        payload.frame = frame
+        return payload

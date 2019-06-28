@@ -1,22 +1,16 @@
 from commands.abstract_command import FrameCommand
-from common import layers
 
 
 class DetectCommand(FrameCommand):
     """"""
 
-
     def __init__(self, detector):
         """"""
-        super().__init__()
+        super().__init__('d')
         self.detector = detector
 
-
-    @classmethod
-    def get_layer_type(cls):
-        return layers.RawDataProcessing.DETECTION
-
-    def execute(self, frame_container):
-        frame = frame_container.frame
+    def _execute(self, payload):
+        frame = payload.frame
         detections = self.detector.detect(frame)
-        return detections
+        payload.detections = detections
+        return payload

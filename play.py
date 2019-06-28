@@ -7,8 +7,9 @@ import pandas as pd
 import logging
 
 from common.exceptions import ArgumentException
-from orchastrator import Orchestrator
 from settings.all_cameras import data as cameras_dict
+from builders.pipeline_director import PipelineDirector
+from builders.visual_pipeline_builder import VisualPipelineBuilder
 from common.utils import init_log
 
 logger = logging.getLogger(__name__)
@@ -48,15 +49,22 @@ def get_url(camera_id: Union[int, str] = None):
     logger.debug(msg)
 
     url = selected_row[col_url]
-    return url
+    title = selected_row[col_name]
+    return url, title
 
 
 def main(camera_id=None, yolo=None):
     init_log()
-    url = get_url(camera_id)
-    # play(url, yolo_detector=yolo)
-    orchestrator = Orchestrator(url=url, yolo=yolo)
-    orchestrator.start()
+    url, title = get_url(camera_id)
+
+    builder = VisualPipelineBuilder(window_title=title)
+    director = PipelineDirector(builder)
+    pipeline = director.build(url)
+
+    pipeline.subscribe(on_next=lambda payload: payload,
+                       on_completed=lambda: logger.info("Stream ended"),
+                       on_error=lambda e: logger.exception('Got on error'))
+
 
 
 if __name__ == '__main__':
