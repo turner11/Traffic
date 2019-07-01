@@ -15,5 +15,6 @@ class ShowObserver(ObserverBase):
 
     def on_next(self, payload):
         frame = payload.frame
+        cv2.namedWindow(self.title, cv2.WINDOW_NORMAL)
         cv2.imshow(self.title, frame)
 

@@ -1,4 +1,6 @@
 from builders.runtime_pipeline_builder import RunTimePipelineBuilder
+from commands.mark_tracking_command import MarkTrackingCommand
+from commands.track_detections_command import TrackDetectionsCommand
 
 from trackers.opencv_tracker import OpenCvTracker
 from yolo_detectors.yolo_detector import YoloDetector
@@ -17,7 +19,7 @@ class FullPipelineBuilder(RunTimePipelineBuilder):
         self.detector = detector or YoloDetector.factory(yolo=args.get('yolo'))
         self.tracker = tracker
 
-        raw_data_layers = [DetectCommand(self.detector), TrackCommand(self.tracker)]
+        raw_data_layers = [DetectCommand(self.detector), TrackDetectionsCommand(), MarkTrackingCommand(), TrackCommand(self.tracker)]
         augmentation_layers = [DrawBoundingBoxCommand(), DrawStatsCommand()]
         output_layers = []
 
