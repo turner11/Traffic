@@ -2,7 +2,7 @@
 
 A demonstration of connecting to real life traffic camers and monitoring traffic (detection + tracking).  
 
-The story behind this project is that as [good developer](https://www.techinasia.com/talk/3-great-virtues-of-a-programmer-laziness-impatience-and-hubris),  [@coffeelover82](https://github.com/coffeelover82) got impatient with the traffic light on his way to work, that without any apparent good reason made him wait every day at 5:00 AM while no other cars were to be seen.   
+The story behind this project is that as a [good developer](https://www.techinasia.com/talk/3-great-virtues-of-a-programmer-laziness-impatience-and-hubris),  [@coffeelover82](https://github.com/coffeelover82) got impatient with the traffic light on his way to work, that without any apparent good reason made him wait every day at 5:00 AM while no other cars were to be seen.   
 Being the feinschmecker that he is, he decided to get back at that damn traffic light, and optimze traffic lights world wide.  
 This project is the the work in progress of this effort.  
 
