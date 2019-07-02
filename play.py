@@ -17,14 +17,14 @@ logger = logging.getLogger(__name__)
 
 
 def get_url(camera_id: Union[int, str] = None):
-    if Path(str(camera_id)).exists():
-        # This allows specifying a file
-        return str(camera_id)
-    if not str(camera_id).isdigit():
-        raise ArgumentException(f'camera_id must be a valid path or an integer '
-                                f'(got {type(camera_id).__name__} - {camera_id})')
-
-    camera_id = int(camera_id)
+    if camera_id is not None:
+        if Path(str(camera_id)).exists():
+            # This allows specifying a file
+            path = str(camera_id)
+            return path, path
+        if not str(camera_id).isdigit():
+            raise ArgumentException(f'camera_id must be a valid path or an integer '
+                                    f'(got {type(camera_id).__name__} - {camera_id})')
 
     col_index, col_name, col_title, col_url = 'index', 'name', 'title', 'player_url_web'
     CameraInfo = namedtuple('CameraInfo', [col_index, col_name, col_title, col_url])
@@ -45,6 +45,7 @@ def get_url(camera_id: Union[int, str] = None):
             if camera_id.isdigit():
                 camera_id = int(camera_id)
 
+    camera_id = int(camera_id)
     selected_row = df.loc[camera_id]
     msg = f'using camera: {selected_row[col_name]}'
     logger.debug(msg)

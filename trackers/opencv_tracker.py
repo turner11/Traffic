@@ -21,7 +21,7 @@ class OpenCvTracker(object):
         """"""
         super().__init__()
         self.tracker = tracker
-        self.multi_tracker = cv2.MultiTracker_create()
+        self.multi_tracker = None
         self.started_tracking = False
 
     def _get_tracker(self, tracker):
@@ -33,6 +33,9 @@ class OpenCvTracker(object):
         return f'{self.__class__.__name__}(tracker={self.tracker})'
 
     def track(self, frame) -> (object, bool):
+        if self.multi_tracker is None:
+            self.multi_tracker = cv2.MultiTracker_create()
+
         trackers = self.multi_tracker
 
         # grab the new bounding box coordinates of the objects
@@ -54,6 +57,8 @@ class OpenCvTracker(object):
         self.started_tracking = True
 
     def reset(self):
-        self.multi_tracker.clear()
         self.started_tracking = False
-        self.fps = None
+        if self.multi_tracker is None:
+            self.multi_tracker.clear()
+            self.multi_tracker = None
+
