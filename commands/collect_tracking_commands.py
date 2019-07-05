@@ -4,13 +4,16 @@ from commands.abstract_command import FrameCommand
 
 class TrackDetectionsCommand(FrameCommand):
     """"""
-
+    LABELS_TO_TRACK = {'motorbike', 'bicycle', 'stop sign', 'truck', 'bus', 'car', 'person', 'cat', 'dog', 'horse',
+                       'sheep', 'cow', 'elephant', 'bear', 'zebra', 'giraffe', 'backpack', 'umbrella', 'handbag',
+                       'suitcase', 'cell phone', }  # 'traffic light'
     def __init__(self):
         """"""
         super().__init__(toggle_key='t')
 
     def _execute(self, payload):
-        boxes = (detection.bounding_box for detection in payload.detections)
+        relevant_detections = (detection for detection in payload.detections if detection.label in self.LABELS_TO_TRACK)
+        boxes = (detection.bounding_box for detection in relevant_detections)
         boxes = [tuple(box) for box in boxes]
         payload.tracking_rois.extend(boxes)
 
