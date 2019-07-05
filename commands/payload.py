@@ -12,6 +12,7 @@ class Payload(object):
         self.frame = frame
         self.detections = detections or []
         self.tracking_rois = tracking_rois or []
+        self.tracking_boxes = []
         self.key_pressed = key_pressed or None
         self.debug_data = OrderedDict()
         self.debug_string = ''

@@ -28,3 +28,15 @@ class BoundingBox(object):
     def __iter__(self):
         for val in (self.x, self.y, self.w, self.h):
             yield val
+
+
+class TrackedBoundingBox(BoundingBox):
+    """"""
+
+    def __init__(self, identifier, x, y, w, h):
+        """"""
+        super().__init__(x, y, w, h)
+        self.identifier = identifier
+
+    def __repr__(self):
+        return super().__repr__()

@@ -20,14 +20,13 @@ class TrackCommand(FrameCommand):
         for init_bounding_box in payload.tracking_rois:
             self.tracker.add_tracker(frame, init_bounding_box)
 
-        is_success, frame = tracker.track(frame)
+        is_success, boxes = tracker.track(frame)
 
         should_reset = not is_success
         if should_reset:
-            frame = payload.frame
             self.is_on = False
 
-        payload.frame = frame
+        payload.tracking_boxes.extend(boxes)
         return payload
 
     def _is_on_changed(self, is_on):

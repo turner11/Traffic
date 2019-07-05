@@ -1,7 +1,9 @@
-import cv2
-from collections import OrderedDict, namedtuple
+import itertools
 
-from common.types import BoundingBox
+import cv2
+from collections import OrderedDict
+
+from common.types import TrackedBoundingBox
 
 OPENCV_OBJECT_TRACKERS = OrderedDict([
     ('csrt', cv2.TrackerCSRT_create),
@@ -18,6 +20,7 @@ OPENCV_OBJECT_TRACKERS = OrderedDict([
 # KCF: Fast and accurate
 # CSRT: More accurate than KCF but slower
 # MOSSE: Extremely fast but not as accurate as either KCF or CSRT
+id_generator = itertools.count()
 
 class OpenCvTracker(object):
     """"""
@@ -26,7 +29,7 @@ class OpenCvTracker(object):
         """"""
         super().__init__()
         self.tracker_name = tracker
-        self.trackers = []
+        self.trackers = {}
 
     @staticmethod
     def _get_tracker(tracker=None):
@@ -48,8 +51,8 @@ class OpenCvTracker(object):
         trackers = self.trackers
 
         results = {}
-        boxes = {}
-        for i, tracker in enumerate(trackers):
+        boxes = []
+        for tracker_id, tracker in trackers.items():
             # grab the new bounding box coordinates of the objects
             (success, box) = tracker.update(frame)
             results[tracker] = success
@@ -57,16 +60,15 @@ class OpenCvTracker(object):
             # check to see if the tracking was a success
             if success:
                 (x, y, w, h) = [int(v) for v in box]
-                bb = BoundingBox(x, y, w, h)
-                boxes[hash(tracker)] = bb
-                cv2.rectangle(frame, bb.upper_left, bb.lower_right, (0, 255, 0), 1)
+                bb = TrackedBoundingBox(tracker_id, x, y, w, h)
+                boxes.append(bb)
 
         for tracker, success in results.items():
             if not success:
                 self.remove_tracker(tracker)
 
         success = len(results) == 0 or any(s for s in results.values())
-        return success, frame
+        return success, boxes
 
     def add_tracker(self, frame, bounding_box, tracker_name=None):
         # get the tracker
@@ -74,12 +76,15 @@ class OpenCvTracker(object):
         tracker = self._get_tracker(tracker_name)
         # Start tracking
         tracker.init(frame, bounding_box)
-        self.trackers.append(tracker)
+        tracker_id = next(id_generator)
+        self.trackers[tracker_id] = tracker
 
     def remove_tracker(self, tracker):
         tracker.clear()
-        self.trackers.remove(tracker)
+        for tracker_id, curr_tracker in list(self.trackers.items()):
+            if tracker == curr_tracker:
+                del self.trackers[tracker_id]
 
     def reset(self):
-        for tracker in self.trackers[:]:
+        for tracker in list(self.trackers.values()):
             self.remove_tracker(tracker)

@@ -23,6 +23,24 @@ def draw_detections(frame, detections):
     return frame
 
 
+def draw_tracked_boxes(frame, tracked_bounding_boxes):
+    for bounding_box in tracked_bounding_boxes:
+        frame = draw_tracked_box(frame, bounding_box)
+    return frame
+
+
+def draw_tracked_box(frame, tracked_bounding_box):
+    """
+       draw a bounding box rectangle and label on the image
+       :param frame: the frame to draw on
+       :param tracked_bounding_box:
+       """
+    text = str(tracked_bounding_box.identifier).lower()
+    color = (0, 255, 0)
+    frame = _draw_labeled_box(tracked_bounding_box, frame, text, color)
+    return frame
+
+
 def draw_detection(frame, detection):
     """
     draw a bounding box rectangle and label on the image
@@ -30,18 +48,25 @@ def draw_detection(frame, detection):
     :param detection:
     """
     label = detection.label.lower()
-    confidence = detection.confidence
-    bounding_box = detection.bounding_box
-    upper_left = bounding_box.upper_left
-    lower_right = bounding_box.lower_right
-    x = bounding_box.x
-    y = bounding_box.y
-
     raw_color = color_by_label[label]
     # noinspection PyTypeChecker
     color = [int(c) for c in raw_color]
 
-    cv2.rectangle(frame, upper_left, lower_right, color, 1)
+    confidence = detection.confidence
     text = f"{label}: {confidence * 100:.0f}%"
+    bounding_box = detection.bounding_box
+
+    frame = _draw_labeled_box(bounding_box, frame, text, color)
+    return frame
+
+
+def _draw_labeled_box(bounding_box, frame, text, color=None):
+    color = color or next(_colors)
+
+    upper_left = bounding_box.upper_left
+    lower_right = bounding_box.lower_right
+    x = bounding_box.x
+    y = bounding_box.y
+    cv2.rectangle(frame, upper_left, lower_right, color, 1)
     cv2.putText(frame, text, (x, y - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 1)
     return frame
