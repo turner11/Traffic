@@ -3,7 +3,6 @@ from pathlib import Path
 from typing import Union
 import numpy as np
 import argparse
-import time
 import cv2
 import logging
 from yolo_detectors.configurations import yolo_detector_folders
@@ -14,6 +13,7 @@ logger = logging.getLogger(__name__)
 
 DEFAULT_CONFIDENCE = 0.5
 DEFAULT_THRESHOLD = 0.3
+DEFAULT_BLOB_SIZE = (480, 480)
 
 
 # https://www.pyimagesearch.com/2018/11/12/yolo-object-detection-with-opencv/
@@ -23,6 +23,7 @@ class YoloDetector(object):
     def __init__(self, yolo_folder: YoloFolder,
                  min_confidence: float = DEFAULT_CONFIDENCE,
                  threshold: float = DEFAULT_THRESHOLD,
+                 blob_size: (int, int) = DEFAULT_BLOB_SIZE ,
                  use_gpu: bool = True) -> None:
         """
         :param yolo_folder: the yolo folder instance
@@ -30,6 +31,8 @@ class YoloDetector(object):
         :param threshold: threshold when applying non-maxima suppression
         """
         super().__init__()
+        self.scale_factor = 1 / 255.0
+        self.blob_size = blob_size
         # load the COCO class labels our YOLO model was trained on
         self.yolo_folder = yolo_folder
         self.labels_path = str(yolo_folder.labels_file)
@@ -88,15 +91,10 @@ class YoloDetector(object):
         # construct a blob from the input image and then perform a forward
         # pass of the YOLO object detector, giving us our bounding boxes and
         # associated probabilities
-        # blob = cv2.dnn.blobFromImage(image, 1 / 255.0, (416, 416), swapRB=True, crop=False)
-        blob = cv2.dnn.blobFromImage(image, 1 / 255.0, (416, 416), swapRB=True, crop=False)
+        blob = cv2.dnn.blobFromImage(image, scalefactor=self.scale_factor, size=self.blob_size, swapRB=True, crop=False)
         net.setInput(blob)
-        start = time.time()
-        layer_outputs = net.forward(ln)
-        end = time.time()
 
-        # show timing information on YOLO
-        # logger.debug("YOLO took {:.6f} seconds".format(end - start))
+        layer_outputs = net.forward(ln)
 
         # initialize our lists of detected bounding boxes, confidences, and
         # class IDs, respectively

@@ -24,6 +24,7 @@ class PipelineDirector(object):
     def __repr__(self):
         return super().__repr__()
 
+    # noinspection PyUnusedLocal
     @staticmethod
     def get_stream(url, observer, scheduler):
         cap = cv2.VideoCapture(url)
