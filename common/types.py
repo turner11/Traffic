@@ -23,7 +23,7 @@ class BoundingBox(object):
         self.h = h
 
     def __repr__(self):
-        return f'{self.__class__.__name__}(self.x={self.x}, self.x={self.y}, self.x={self.w}, self.x={self.h})'
+        return f'{self.__class__.__name__}(self.x={self.x}, self.y={self.y}, self.w={self.w}, self.h={self.h})'
 
     def __iter__(self):
         for val in (self.x, self.y, self.w, self.h):
@@ -39,4 +39,8 @@ class TrackedBoundingBox(BoundingBox):
         self.identifier = identifier
 
     def __repr__(self):
-        return super().__repr__()
+        return f'{self.__class__.__name__}(identifier={self.identifier}, ' \
+                                           f'self.x={self.x}, ' \
+                                           f'self.y={self.y}, ' \
+                                           f'self.w={self.w}, ' \
+                                           f'self.h={self.h})'

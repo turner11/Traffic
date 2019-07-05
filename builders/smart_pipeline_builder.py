@@ -20,9 +20,10 @@ class SmartPipelineBuilder(RunTimePipelineBuilder):
 
         cmd_auto_track = AutoTrackCommand(DetectCommand(self.detector), TrackCommand(self.tracker))
 
+        from commands.to_tabular_data_command import TabularDataCommand
         raw_data_layers = [cmd_auto_track]
+        output_layers = [TabularDataCommand()]
         augmentation_layers = [DrawBoundingBoxCommand(), DisplayDebugCommand(), DrawStatsCommand()]
-        output_layers = []
 
         commands = raw_data_layers + augmentation_layers + output_layers
         super().__init__(commands)

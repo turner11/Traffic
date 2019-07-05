@@ -12,8 +12,8 @@ class AutoTrackCommand(FrameCommand):
         super().__init__(toggle_key='a')
         self.is_on = False
         self.detect_command = detect_command
-        self.track_command = track_command
         self.collect_command = TrackDetectionsCommand()
+        self.track_command = track_command
 
     def _execute(self, payload):
         collect_detections = len(self.track_command.tracker) == 0
