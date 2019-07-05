@@ -5,10 +5,12 @@ import numpy as np
 import argparse
 import cv2
 import logging
+
+from common.types import BoundingBox
 from yolo_detectors.configurations import yolo_detector_folders
 from yolo_detectors.yolo_config_folder import YoloFolder
 
-Detection = namedtuple('Detection', ['label', 'confidence', 'x', 'y', 'w', 'h'])
+Detection = namedtuple('Detection', ['label', 'confidence', 'bounding_box'])
 logger = logging.getLogger(__name__)
 
 DEFAULT_CONFIDENCE = 0.5
@@ -150,7 +152,8 @@ class YoloDetector(object):
                 class_id = class_ids[i]
                 label = labels[class_id]
                 confidence = confidences[i]
-                detection = Detection(label, confidence, x, y, w, h)
+                bounding_box = BoundingBox(x, y, w, h)
+                detection = Detection(label, confidence, bounding_box)
                 detections.append(detection)
 
         return detections

@@ -1,6 +1,7 @@
-from collections import OrderedDict
-
 import cv2
+from collections import OrderedDict, namedtuple
+
+from common.types import BoundingBox
 
 OPENCV_OBJECT_TRACKERS = OrderedDict([
     ('csrt', cv2.TrackerCSRT_create),
@@ -18,7 +19,6 @@ OPENCV_OBJECT_TRACKERS = OrderedDict([
 # CSRT: More accurate than KCF but slower
 # MOSSE: Extremely fast but not as accurate as either KCF or CSRT
 
-
 class OpenCvTracker(object):
     """"""
 
@@ -26,8 +26,7 @@ class OpenCvTracker(object):
         """"""
         super().__init__()
         self.tracker_name = tracker
-        self.multi_tracker = None
-        self.started_tracking = False
+        self.trackers = []
 
     @staticmethod
     def _get_tracker(tracker=None):
@@ -43,31 +42,41 @@ class OpenCvTracker(object):
         return f'{self.__class__.__name__}(tracker={self.tracker_name})'
 
     def track(self, frame) -> (object, bool):
-        if self.multi_tracker is None:
-            self.multi_tracker = cv2.MultiTracker_create()
+        trackers = self.trackers
 
-        trackers = self.multi_tracker
+        results = {}
+        boxes = {}
+        for i, tracker in enumerate(trackers):
+            # grab the new bounding box coordinates of the objects
+            (success, box) = tracker.update(frame)
+            results[tracker] = success
 
-        # grab the new bounding box coordinates of the objects
-        (success, boxes) = trackers.update(frame)
-
-        # check to see if the tracking was a success
-        if success:
-            for box in boxes:
+            # check to see if the tracking was a success
+            if success:
                 (x, y, w, h) = [int(v) for v in box]
-                cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 1)
-        else:
-            self.reset()
+                bb = BoundingBox(x, y, w, h)
+                boxes[hash(tracker)] = bb
+                cv2.rectangle(frame, bb.upper_left, bb.lower_right, (0, 255, 0), 1)
 
+        for tracker, success in results.items():
+            if not success:
+                self.remove_tracker(tracker)
+
+        success = len(results) == 0 or any(s for s in results.values())
         return success, frame
 
-    def add_tracker(self, frame, init_bounding_box):
-        tracker = self._get_tracker(self.tracker_name)
-        self.multi_tracker.add(tracker, frame, init_bounding_box)
-        self.started_tracking = True
+    def add_tracker(self, frame, bounding_box, tracker_name=None):
+        # get the tracker
+        tracker_name = tracker_name or self.tracker_name
+        tracker = self._get_tracker(tracker_name)
+        # Start tracking
+        tracker.init(frame, bounding_box)
+        self.trackers.append(tracker)
+
+    def remove_tracker(self, tracker):
+        tracker.clear()
+        self.trackers.remove(tracker)
 
     def reset(self):
-        self.started_tracking = False
-        if self.multi_tracker is None:
-            self.multi_tracker.clear()
-            self.multi_tracker = None
+        for tracker in self.trackers:
+            self.remove_tracker(tracker)

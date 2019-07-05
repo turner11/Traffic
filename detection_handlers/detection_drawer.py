@@ -31,18 +31,17 @@ def draw_detection(frame, detection):
     """
     label = detection.label.lower()
     confidence = detection.confidence
-    x = detection.x
-    y = detection.y
-    w = detection.w
-    h = detection.h
+    bounding_box = detection.bounding_box
+    upper_left = bounding_box.upper_left
+    lower_right = bounding_box.lower_right
+    x = bounding_box.x
+    y = bounding_box.y
 
     raw_color = color_by_label[label]
     # noinspection PyTypeChecker
     color = [int(c) for c in raw_color]
 
-    cv2.rectangle(frame, (x, y), (x + w, y + h), color, 1)
+    cv2.rectangle(frame, upper_left, lower_right, color, 1)
     text = f"{label}: {confidence * 100:.0f}%"
     cv2.putText(frame, text, (x, y - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 1)
-    ## show the output image
-    # cv2.imshow("Image", image)
     return frame

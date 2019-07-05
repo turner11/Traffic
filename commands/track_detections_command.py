@@ -13,7 +13,8 @@ class TrackDetectionsCommand(FrameCommand):
         self._is_on = False
 
     def _execute(self, payload):
-        boxes = [(detection.x, detection.y, detection.w, detection.h) for detection in payload.detections]
+        boxes = (detection.bounding_box for detection in payload.detections)
+        boxes = [tuple(box) for box in boxes]
         payload.tracking_rois.extend(boxes)
 
         # Don't start marking at every frame

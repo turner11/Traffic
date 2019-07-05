@@ -26,10 +26,15 @@ class TrackCommand(FrameCommand):
         if should_reset:
             frame = payload.frame
             self._is_on = False
-            tracker.reset()
 
         payload.frame = frame
         return payload
 
     def _is_on_changed(self, is_on):
         self.tracker.reset()
+
+    def get_debug_data(self) -> str:
+        base_string = super().get_debug_data()
+        return f'{base_string}; ({len(self.tracker.trackers)} trackers)'
+
+
