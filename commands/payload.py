@@ -1,3 +1,4 @@
+from collections import OrderedDict
 from copy import copy, deepcopy
 
 
@@ -12,6 +13,7 @@ class Payload(object):
         self.detections = detections or []
         self.tracking_rois = tracking_rois or []
         self.key_pressed = key_pressed or None
+        self.debug_data = OrderedDict()
         self._args = args
 
     def __repr__(self):

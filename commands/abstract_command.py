@@ -1,6 +1,8 @@
 from abc import ABC, abstractmethod
+from typing import List
 
 from commands.payload import Payload
+from commands.types import DebugData
 
 
 class FrameCommand(ABC):
@@ -22,6 +24,7 @@ class FrameCommand(ABC):
         self.toggle_key = toggle_key
         self.subscribed_keys = subscribed_keys or []
         self._is_on = True
+        self.is_on = True
 
     def __call__(self, *args, **kwargs):
         return self.execute(*args, **kwargs)
@@ -35,9 +38,11 @@ class FrameCommand(ABC):
         elif payload.key_pressed in self.subscribed_keys:
             self.subscribed_key_presses(payload.key_pressed, payload)
 
-
         if self._is_on:
             payload = self._execute(payload)
+
+        debug_data = self.get_debug_data()
+        payload.debug_data[self.__class__.__name__] = debug_data
 
         return payload
 
@@ -50,3 +55,6 @@ class FrameCommand(ABC):
 
     def subscribed_key_presses(self, key_pressed, payload):
         pass
+
+    def get_debug_data(self) -> str:
+        return f'{"On" if self.is_on else "Off"}; (key:{self.toggle_key})'

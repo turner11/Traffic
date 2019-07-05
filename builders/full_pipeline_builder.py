@@ -1,10 +1,10 @@
 from builders.runtime_pipeline_builder import RunTimePipelineBuilder
-from commands.mark_tracking_command import MarkTrackingCommand
-from commands.track_detections_command import TrackDetectionsCommand
 
-from trackers.opencv_tracker import OpenCvTracker
 from yolo_detectors.yolo_detector import YoloDetector
 
+from commands.display_debug_command import DisplayDebugCommand
+from commands.mark_tracking_command import MarkTrackingCommand
+from commands.track_detections_command import TrackDetectionsCommand
 from commands.detect_command import DetectCommand
 from commands.track_command import TrackCommand
 from commands.draw_bounding_box_command import DrawBoundingBoxCommand

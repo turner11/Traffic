@@ -6,15 +6,12 @@ from commands.abstract_command import FrameCommand
 class DrawStatsCommand(FrameCommand):
     """"""
 
-
-
-    def __init__(self, additional_info: dict = None):
+    def __init__(self):
         """
         :param additional_info: additional info to show
         """
         super().__init__(toggle_key='s')
         self.fps = None
-        self.additional_info = additional_info or {}
         self.started = False
 
     def _execute(self, payload):
@@ -31,7 +28,7 @@ class DrawStatsCommand(FrameCommand):
 
             info = [
                        ("FPS", "{:.2f}".format(fps.fps())),
-                   ] + list(self.additional_info.items())
+                   ] + list(payload.debug_data.items())
 
             # output_frame = imutils.resize(frame, width=500)
             (H, W) = frame.shape[:2]
@@ -39,8 +36,9 @@ class DrawStatsCommand(FrameCommand):
             for (i, (k, v)) in enumerate(info):
                 text = "{}: {}".format(k, v)
                 color = (0, 255, 0)
-                cv2.putText(frame, text, (10, H - ((i * 20) + 20)),
-                            cv2.FONT_HERSHEY_SIMPLEX, 0.6, color, 1)
+                org = (10, H - ((i * 20) + 20))
+                font_scale = 0.4
+                cv2.putText(frame, text, org, cv2.FONT_HERSHEY_SIMPLEX, font_scale , color, thickness=1)
         payload.frame = frame
         return payload
 
@@ -48,7 +46,3 @@ class DrawStatsCommand(FrameCommand):
         super()._is_on_changed(is_on)
         self.fps = None
         self.started = False
-
-
-
-
