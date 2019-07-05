@@ -7,7 +7,6 @@ import pandas as pd
 import logging
 
 from common.exceptions import ArgumentException
-from observers.show_observer import ShowObserver
 from settings.all_cameras import data as cameras_dict
 from builders.pipeline_director import PipelineDirector
 from builders.full_pipeline_builder import FullPipelineBuilder
@@ -55,27 +54,26 @@ def get_url(camera_id: Union[int, str] = None):
     return url, title
 
 
-def main(camera_id=None, yolo=None):
+def main(camera_id=None, yolo=None, save_folder=None):
     init_log()
     url, title = get_url(camera_id)
 
     builder = FullPipelineBuilder(yolo=yolo)
-    # from builders.debug_pipeline_builder import DebugPipelineBuilder
-    # builder = DebugPipelineBuilder(yolo=yolo)
     director = PipelineDirector(builder)
-    pipeline = director.build(url)
+    pipeline, observer = director.build(url, title.lower(), save_folder=save_folder)
 
-    pipeline.subscribe(ShowObserver(title))
-    # pipeline.subscribe(SaveObserver(path='...', title=title))
+    pipeline.subscribe(observer)
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='')
     parser.add_argument('-c', dest='camera', help='the id of camera to use or URL', required=False, default=None)
+    parser.add_argument('-s', dest='save_folder', help='The location to save stream to', required=False, default=None)
     parser.add_argument("-y", "--yolo", required=False, help="YOLO version or base path to YOLO directory",
                         default='v3')
     args = parser.parse_args()
 
     camera_id_arg = args.camera  # args.camera if args.camera >= 0 else None
     yolo_detector_arg = args.yolo
-    main(camera_id=camera_id_arg, yolo=yolo_detector_arg)
+    save_folder = args.save_folder
+    main(camera_id=camera_id_arg, yolo=yolo_detector_arg, save_folder=save_folder)
