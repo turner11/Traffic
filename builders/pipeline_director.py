@@ -6,6 +6,8 @@ from functools import partial
 import logging
 
 from builders.pipeline_builders import PipeLineBuilder
+from observers.save_observer import SaveObserver
+from observers.show_observer import ShowObserver
 from commands.payload import Payload
 
 logger = logging.getLogger(__name__)
@@ -32,21 +34,21 @@ class PipelineDirector(object):
         try:
             while cap.isOpened():
                 is_read_success, raw_frame = cap.read()
-                # Using the FPS for getting smooth video while waiting
-                fps.update()
-                fps.stop()
-                wait_time = max(fps.fps(), 1)
-                key = chr(cv2.waitKey(round(wait_time)) & 0xFF)
-                is_q_pressed = key == 'q'
-
-                if is_q_pressed:
-                    break
-
                 if is_read_success:
+                    # Using the FPS for getting smooth video while waiting
+                    fps.update()
+                    fps.stop()
+                    wait_time = round(max(fps.fps(), 1))
+                    key = chr(cv2.waitKey(wait_time) & 0xFF)
+                    is_q_pressed = key == 'q'
+
+                    if is_q_pressed:
+                        break
+
                     observer.on_next(Payload(frame=raw_frame, key_pressed=key))
+
                 else:
                     observer.on_error('Failed to read video capture')
-                    observer.on_completed()
                     break
         finally:
             cap.release()
@@ -54,7 +56,7 @@ class PipelineDirector(object):
 
         observer.on_completed()
 
-    def build(self, url):
+    def build(self, url, title='', save_folder=None):
         source_func = partial(self.get_stream, url)
 
         # noinspection PyTypeChecker
@@ -64,4 +66,9 @@ class PipelineDirector(object):
         operators = [op.map(cmd) for cmd in commands]
         pipeline = source.pipe(*operators)
 
-        return pipeline
+        if save_folder:
+            observer = SaveObserver(path=f'{save_folder}\\{title}.avi', title=title)
+        else:
+            observer = ShowObserver(title)
+
+        return pipeline, observer
