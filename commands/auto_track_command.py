@@ -16,8 +16,6 @@ class AutoTrackCommand(FrameCommand):
         tracker = self.tracker
         is_success, frame = tracker.track(payload.frame)
 
-        trackers = cv2.MultiTracker_create()
-
         should_reset = not is_success
         if should_reset:
             frame = payload.frame

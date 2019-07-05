@@ -1,13 +1,18 @@
+from collections import OrderedDict
+
 import cv2
-OPENCV_OBJECT_TRACKERS = {
-    'csrt': cv2.TrackerCSRT_create,
-    'mosse': cv2.TrackerMOSSE_create,
-    'kcf': cv2.TrackerKCF_create,
-    'boosting': cv2.TrackerBoosting_create,
-    'mil': cv2.TrackerMIL_create,
-    'tld': cv2.TrackerTLD_create,
-    'medianflow': cv2.TrackerMedianFlow_create,
-}
+
+OPENCV_OBJECT_TRACKERS = OrderedDict([
+    ('csrt', cv2.TrackerCSRT_create),
+    ('kcf', cv2.TrackerKCF_create),
+    ('mosse', cv2.TrackerMOSSE_create),
+    ('boosting', cv2.TrackerBoosting_create),
+    ('mil', cv2.TrackerMIL_create),
+    ('tld', cv2.TrackerTLD_create),
+    ('medianflow', cv2.TrackerMedianFlow_create),
+    ]
+)
+
 
 # KCF: Fast and accurate
 # CSRT: More accurate than KCF but slower
@@ -17,20 +22,25 @@ OPENCV_OBJECT_TRACKERS = {
 class OpenCvTracker(object):
     """"""
 
-    def __init__(self, tracker: str = 'csrt'):
+    def __init__(self, tracker: str = None):
         """"""
         super().__init__()
-        self.tracker = tracker
+        self.tracker_name = tracker
         self.multi_tracker = None
         self.started_tracking = False
 
-    def _get_tracker(self, tracker):
-        ctor = OPENCV_OBJECT_TRACKERS[tracker]
+    @staticmethod
+    def _get_tracker(tracker=None):
+        if tracker:
+            ctor = OPENCV_OBJECT_TRACKERS[tracker]
+        else:
+            tracker_name, ctor = list(OPENCV_OBJECT_TRACKERS.items())[0]
+
         instance = ctor()
         return instance
 
     def __repr__(self):
-        return f'{self.__class__.__name__}(tracker={self.tracker})'
+        return f'{self.__class__.__name__}(tracker={self.tracker_name})'
 
     def track(self, frame) -> (object, bool):
         if self.multi_tracker is None:
@@ -52,7 +62,7 @@ class OpenCvTracker(object):
         return success, frame
 
     def add_tracker(self, frame, init_bounding_box):
-        tracker = self._get_tracker(self.tracker)
+        tracker = self._get_tracker(self.tracker_name)
         self.multi_tracker.add(tracker, frame, init_bounding_box)
         self.started_tracking = True
 
@@ -61,4 +71,3 @@ class OpenCvTracker(object):
         if self.multi_tracker is None:
             self.multi_tracker.clear()
             self.multi_tracker = None
-
