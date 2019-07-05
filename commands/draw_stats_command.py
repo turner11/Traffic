@@ -13,6 +13,7 @@ class DrawStatsCommand(FrameCommand):
         self.font = cv2.FONT_HERSHEY_TRIPLEX
         self.color = (0, 255, 0)
         self.font_scale = 0.6
+        self.is_on = True
 
     def _execute(self, payload):
         frame = payload.frame

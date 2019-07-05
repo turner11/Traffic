@@ -8,7 +8,6 @@ class TrackDetectionsCommand(FrameCommand):
     def __init__(self):
         """"""
         super().__init__(toggle_key='t')
-        self._is_on = False
 
     def _execute(self, payload):
         boxes = (detection.bounding_box for detection in payload.detections)
@@ -16,7 +15,7 @@ class TrackDetectionsCommand(FrameCommand):
         payload.tracking_rois.extend(boxes)
 
         # Don't start marking at every frame
-        self._is_on = False
+        self.is_on = False
         return payload
 
 
@@ -26,7 +25,7 @@ class ManualTrackingCommand(FrameCommand):
     def __init__(self):
         """"""
         super().__init__(toggle_key='m')
-        self._is_on = False
+        self.is_on = False
 
     def _execute(self, payload):
         frame = payload.frame
@@ -39,5 +38,5 @@ class ManualTrackingCommand(FrameCommand):
             payload.tracking_rois.append(init_bounding_box)
 
         # Don't start marking at every frame
-        self._is_on = False
+        self.is_on = False
         return payload

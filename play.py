@@ -6,6 +6,7 @@ from typing import Union
 import pandas as pd
 import logging
 
+from builders.smart_pipeline_builder import SmartPipelineBuilder
 from common.exceptions import ArgumentException
 from settings.all_cameras import data as cameras_dict
 from builders.pipeline_director import PipelineDirector
@@ -58,7 +59,8 @@ def main(camera_id=None, yolo=None, save_folder=None):
     init_log()
     url, title = get_url(camera_id)
 
-    builder = FullPipelineBuilder(yolo=yolo)
+    # builder = FullPipelineBuilder(yolo=yolo)
+    builder = SmartPipelineBuilder(yolo=yolo)
     director = PipelineDirector(builder)
     pipeline, observer = director.build(url, title.lower(), save_folder=save_folder)
 

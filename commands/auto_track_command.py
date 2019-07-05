@@ -1,29 +1,33 @@
 import cv2
 
 from commands.abstract_command import FrameCommand
+from commands.collect_tracking_commands import TrackDetectionsCommand
 
 
 class AutoTrackCommand(FrameCommand):
     """"""
 
-    def __init__(self, tracker=None):
+    def __init__(self, detect_command, track_command):
         """"""
         super().__init__(toggle_key='a')
-        self._is_on = False
-        self.tracker = tracker
+        self.is_on = False
+        self.detect_command = detect_command
+        self.track_command = track_command
+        self.collect_command = TrackDetectionsCommand()
 
     def _execute(self, payload):
-        tracker = self.tracker
-        is_success, frame = tracker.track(payload.frame)
+        collect_detections = len(self.track_command.tracker) == 0
 
-        should_reset = not is_success
-        if should_reset:
-            frame = payload.frame
-            self._is_on = False
-            tracker.reset()
+        if collect_detections:
+            payload = self.detect_command._execute(payload)
+            payload = self.collect_command._execute(payload)
 
-        payload.frame = frame
+        payload = self.track_command._execute(payload)
         return payload
 
+    def get_debug_data(self) -> str:
+        base_string = super().get_debug_data()
+        return f'{base_string}; ({len(self.track_command.tracker)} trackers)'
+
     def _is_on_changed(self, is_on):
-        self.tracker.reset()
+        self.track_command.reset()

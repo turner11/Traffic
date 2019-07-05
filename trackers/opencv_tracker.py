@@ -41,6 +41,9 @@ class OpenCvTracker(object):
     def __repr__(self):
         return f'{self.__class__.__name__}(tracker={self.tracker_name})'
 
+    def __len__(self):
+        return len(self.trackers)
+
     def track(self, frame) -> (object, bool):
         trackers = self.trackers
 
@@ -78,5 +81,5 @@ class OpenCvTracker(object):
         self.trackers.remove(tracker)
 
     def reset(self):
-        for tracker in self.trackers:
+        for tracker in self.trackers[:]:
             self.remove_tracker(tracker)

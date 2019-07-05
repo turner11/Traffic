@@ -20,8 +20,8 @@ class FrameCommand(ABC):
         super().__init__()
         self.toggle_key = toggle_key
         self.subscribed_keys = subscribed_keys or []
-        self._is_on = True
-        self.is_on = True
+        self._is_on = False
+        self.is_on = False
 
     def __call__(self, *args, **kwargs):
         return self.execute(*args, **kwargs)
@@ -35,7 +35,7 @@ class FrameCommand(ABC):
         elif payload.key_pressed in self.subscribed_keys:
             self.subscribed_key_presses(payload.key_pressed, payload)
 
-        if self._is_on:
+        if self.is_on:
             payload = self._execute(payload)
 
         debug_data = self.get_debug_data()

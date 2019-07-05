@@ -9,6 +9,7 @@ class DrawBoundingBoxCommand(FrameCommand):
     def __init__(self):
         """"""
         super().__init__(toggle_key='b')
+        self.is_on = True
 
     def _execute(self, payload):
         frame = payload.frame

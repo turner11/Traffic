@@ -10,7 +10,7 @@ from commands.draw_bounding_box_command import DrawBoundingBoxCommand
 from commands.draw_stats_command import DrawStatsCommand
 
 
-class FullPipelineBuilder(RunTimePipelineBuilder):
+class SmartPipelineBuilder(RunTimePipelineBuilder):
     """"""
 
     def __init__(self, detector=None, tracker=None, **args):
@@ -18,10 +18,10 @@ class FullPipelineBuilder(RunTimePipelineBuilder):
         self.detector = detector or YoloDetector.factory(yolo=args.get('yolo'))
         self.tracker = tracker
 
-        cmd_detect = DetectCommand(self.detector)
-        cmd_track = TrackCommand(self.tracker)
-        raw_data_layers = [cmd_detect, TrackDetectionsCommand(), ManualTrackingCommand(), cmd_track]
-        augmentation_layers = [DrawBoundingBoxCommand(),DisplayDebugCommand(), DrawStatsCommand()]
+        cmd_auto_track = AutoTrackCommand(DetectCommand(self.detector), TrackCommand(self.tracker))
+
+        raw_data_layers = [cmd_auto_track]
+        augmentation_layers = [DrawBoundingBoxCommand(), DisplayDebugCommand(), DrawStatsCommand()]
         output_layers = []
 
         commands = raw_data_layers + augmentation_layers + output_layers
