@@ -2,7 +2,6 @@ import argparse
 from collections import namedtuple
 from pathlib import Path
 from typing import Union
-
 import pandas as pd
 import logging
 
@@ -77,5 +76,5 @@ if __name__ == '__main__':
 
     camera_id_arg = args.camera  # args.camera if args.camera >= 0 else None
     yolo_detector_arg = args.yolo
-    save_folder = args.folder
-    main(camera_id=camera_id_arg, yolo=yolo_detector_arg, save_folder=save_folder)
+    save_folder_arg = args.folder
+    main(camera_id=camera_id_arg, yolo=yolo_detector_arg, save_folder=save_folder_arg)
