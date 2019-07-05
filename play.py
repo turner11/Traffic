@@ -68,12 +68,12 @@ def main(camera_id=None, yolo=None, save_folder=None):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='')
     parser.add_argument('-c', dest='camera', help='the id of camera to use or URL', required=False, default=None)
-    parser.add_argument('-s', dest='save_folder', help='The location to save stream to', required=False, default=None)
+    parser.add_argument('-f', dest='folder', help='The folder to save stream to', required=False, default=None)
     parser.add_argument("-y", "--yolo", required=False, help="YOLO version or base path to YOLO directory",
                         default='v3')
     args = parser.parse_args()
 
     camera_id_arg = args.camera  # args.camera if args.camera >= 0 else None
     yolo_detector_arg = args.yolo
-    save_folder = args.save_folder
+    save_folder = args.folder
     main(camera_id=camera_id_arg, yolo=yolo_detector_arg, save_folder=save_folder)
