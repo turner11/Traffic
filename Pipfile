@@ -23,6 +23,7 @@ opencv-contrib-python = "*"
 pip = "*"
 rx = "==3.0.0b4"
 pytest-icdiff = "*"
+seaborn = "*"
 
 [requires]
 python_version = "3.6"
