@@ -14,6 +14,7 @@ class Payload(object):
         self.tracking_rois = tracking_rois or []
         self.key_pressed = key_pressed or None
         self.debug_data = OrderedDict()
+        self.debug_string = ''
         self._args = args
 
     def __repr__(self):

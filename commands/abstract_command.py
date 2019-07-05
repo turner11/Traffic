@@ -1,8 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import List
-
 from commands.payload import Payload
-from commands.types import DebugData
 
 
 class FrameCommand(ABC):

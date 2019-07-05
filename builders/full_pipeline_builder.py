@@ -20,7 +20,7 @@ class FullPipelineBuilder(RunTimePipelineBuilder):
         self.tracker = tracker
 
         raw_data_layers = [DetectCommand(self.detector), TrackDetectionsCommand(), MarkTrackingCommand(), TrackCommand(self.tracker)]
-        augmentation_layers = [DrawBoundingBoxCommand(), DrawStatsCommand()]
+        augmentation_layers = [DrawBoundingBoxCommand(),DisplayDebugCommand(), DrawStatsCommand()]
         output_layers = []
 
         commands = raw_data_layers + augmentation_layers + output_layers
