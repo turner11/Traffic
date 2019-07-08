@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import rx
 from rx import operators as op
 import cv2
@@ -68,7 +70,9 @@ class PipelineDirector(object):
         pipeline = source.pipe(*operators)
 
         if save_folder:
-            observer = SaveObserver(path=f'{save_folder}\\{title}.avi', title=title)
+
+            file_name = f'{save_folder}\\{Path(title).name}.avi'
+            observer = SaveObserver(path=file_name, title=title)
         else:
             observer = ShowObserver(title)
 
