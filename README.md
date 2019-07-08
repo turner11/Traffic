@@ -6,7 +6,12 @@ The story behind this project is that as a [good developer](https://www.techinas
 Being the feinschmecker that he is, he decided to get back at that damn traffic light, and optimze traffic lights world wide.  
 This project is the the work in progress of this effort.  
 
-![](media/example.gif)
+Detection             |  Tracking
+:-------------------------:|:-------------------------:
+![](media/example.gif)  |  ![](media/ahisemech.gif)
+
+
+
 
 ## Main Dependencies
 1. [open cv](https://github.com/skvark/opencv-python)
