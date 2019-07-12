@@ -45,14 +45,14 @@ class PipelineDirector(object):
                     # Using the FPS for getting smooth video while waiting
                     fps.update()
                     fps.stop()
-                    wait_time = round(max(fps.fps(), 1))
-                    key = chr(cv2.waitKey(wait_time) & 0xFF)
-                    is_q_pressed = key == 'q'
+                    if True or i_frame % 5 == 0:
+                        wait_time = round(max(fps.fps(), 1))
+                        key = chr(cv2.waitKey(wait_time) & 0xFF)
+                        is_q_pressed = key == 'q'
 
-                    if is_q_pressed:
-                        break
+                        if is_q_pressed:
+                            break
 
-                    if i_frame % 5 == 0:
                         observer.on_next(Payload(frame=raw_frame, key_pressed=key, i_frame=i_frame))
 
                 else:
