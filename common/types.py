@@ -22,6 +22,14 @@ class BoundingBox(object):
         self.w = w
         self.h = h
 
+    def get_scaled(self, factor):
+        w = round(self.w * factor)
+        h = round(self.h * factor)
+        x = self.x# + w # +(w * factor)
+        y = self.y# + h # +(h * factor)
+
+        return BoundingBox(x, y, w, h)
+
     def __repr__(self):
         return f'{self.__class__.__name__}(self.x={self.x}, self.y={self.y}, self.w={self.w}, self.h={self.h})'
 
@@ -44,7 +52,6 @@ class LabeledBoundingBox(BoundingBox):
             f'self.y={self.y}, ' \
             f'self.w={self.w}, ' \
             f'self.h={self.h})'
-
 
 class TrackedBoundingBox(LabeledBoundingBox):
     """"""
