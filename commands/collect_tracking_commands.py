@@ -1,5 +1,6 @@
 import cv2
 from commands.abstract_command import FrameCommand
+from common.types import LabeledBoundingBox
 
 
 class TrackDetectionsCommand(FrameCommand):
@@ -13,8 +14,7 @@ class TrackDetectionsCommand(FrameCommand):
 
     def _execute(self, payload):
         relevant_detections = (detection for detection in payload.detections if detection.label in self.LABELS_TO_TRACK)
-        boxes = (detection.bounding_box for detection in relevant_detections)
-        boxes = [tuple(box) for box in boxes]
+        boxes =(LabeledBoundingBox(detection.label, *detection.bounding_box) for detection in relevant_detections)
         payload.tracking_rois.extend(boxes)
 
         # Don't start marking at every frame
@@ -38,6 +38,7 @@ class ManualTrackingCommand(FrameCommand):
 
         has_bounding_box = any(v != 0 for v in init_bounding_box)
         if has_bounding_box:
+            LabeledBoundingBox('manual', *init_bounding_box)
             payload.tracking_rois.append(init_bounding_box)
 
         # Don't start marking at every frame

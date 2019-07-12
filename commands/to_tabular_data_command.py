@@ -3,7 +3,7 @@ from collections import namedtuple
 from commands.abstract_command import FrameCommand
 from commands.payload import Payload
 
-RowData = namedtuple('RowData', ['id', 'frame', 'x', 'y', 'w', 'h'])
+RowData = namedtuple('RowData', ['id', 'frame', 'x', 'y', 'w', 'h', 'label'])
 
 
 class TabularDataCommand(FrameCommand):
@@ -21,7 +21,7 @@ class TabularDataCommand(FrameCommand):
 
     def _execute(self, payload: Payload) -> Payload:
         boxes = payload.tracking_boxes
-        rows = [RowData(id=b.identifier, frame=self.frame_count, x=b.x, y=b.y, w=b.w, h=b.h) for b in boxes]
+        rows = [RowData(id=b.identifier, frame=self.frame_count, x=b.x, y=b.y, w=b.w, h=b.h, label=b.label) for b in boxes]
         curr_df = pd.DataFrame(rows)
         self.df = pd.concat([self.df, curr_df], sort=False).drop_duplicates(subset=['id', 'x', 'y']) \
             .reset_index(drop=True)

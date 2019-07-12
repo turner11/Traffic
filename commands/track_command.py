@@ -17,8 +17,8 @@ class TrackCommand(FrameCommand):
         tracker = self.tracker
         frame = payload.frame
 
-        for init_bounding_box in payload.tracking_rois:
-            self.tracker.add_tracker(frame, init_bounding_box)
+        for bounding_box in payload.tracking_rois:
+            self.tracker.add_tracker(frame, tuple(bounding_box), label=bounding_box.label)
 
         is_success, boxes = tracker.track(frame)
 

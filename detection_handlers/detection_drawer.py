@@ -35,8 +35,9 @@ def draw_tracked_box(frame, tracked_bounding_box):
        :param frame: the frame to draw on
        :param tracked_bounding_box:
        """
-    text = str(tracked_bounding_box.identifier).lower()
-    color = (0, 255, 0)
+    label = tracked_bounding_box.label
+    text = f'{tracked_bounding_box.identifier} ({label})'.lower()
+    color = static_colors.get(label,(0, 255, 0))
     frame = _draw_labeled_box(tracked_bounding_box, frame, text, color)
     return frame
 

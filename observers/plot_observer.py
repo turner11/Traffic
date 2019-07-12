@@ -18,7 +18,8 @@ class PlotObserver(ObserverBase):
 
         # this is the call to matplotlib that allows dynamic plotting
         plt.ion()
-        fig = plt.figure(figsize=(13, 6))
+
+        fig = plt.figure()#(figsize=(13, 6))
         self.ax = fig.add_subplot(111)
         self.ax.xaxis.set_ticks_position('top')
         plt.ion()
@@ -30,8 +31,14 @@ class PlotObserver(ObserverBase):
             plt.title(f'{len(df["id"].drop_duplicates())} tracked items')
 
             # adjust limits
-            plt.ylim(max(df.y), 0)
-            plt.xlim(0, max(df.x))
+            max_y = max(df.y)
+            max_x = max(df.x)
+            plt.ylim(max_y, 0)
+            plt.xlim(0, max_x)
+
+            frame = payload.original_frame
+            # self.ax.imshow(frame, extent=[0, max_x, 0, max_y])
+            # return
 
             for group_id, group in df.groupby('id'):
                 line = self.lines.get(group_id)

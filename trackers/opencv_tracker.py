@@ -30,6 +30,7 @@ class OpenCvTracker(object):
         super().__init__()
         self.tracker_name = tracker
         self.trackers = {}
+        self.tracker_labels = {}
 
     @staticmethod
     def _get_tracker(tracker=None):
@@ -56,11 +57,12 @@ class OpenCvTracker(object):
             # grab the new bounding box coordinates of the objects
             (success, box) = tracker.update(frame)
             results[tracker] = success
+            label = self.tracker_labels.get(tracker_id, '')
 
             # check to see if the tracking was a success
             if success:
                 (x, y, w, h) = [int(v) for v in box]
-                bb = TrackedBoundingBox(tracker_id, x, y, w, h)
+                bb = TrackedBoundingBox(tracker_id, label, x, y, w, h)
                 boxes.append(bb)
 
         for tracker, success in results.items():
@@ -70,7 +72,7 @@ class OpenCvTracker(object):
         success = len(results) == 0 or any(s for s in results.values())
         return success, boxes
 
-    def add_tracker(self, frame, bounding_box, tracker_name=None):
+    def add_tracker(self, frame, bounding_box, tracker_name=None, label=''):
         # get the tracker
         tracker_name = tracker_name or self.tracker_name
         tracker = self._get_tracker(tracker_name)
@@ -78,6 +80,7 @@ class OpenCvTracker(object):
         tracker.init(frame, bounding_box)
         tracker_id = next(id_generator)
         self.trackers[tracker_id] = tracker
+        self.tracker_labels[tracker_id] = label
 
     def remove_tracker(self, tracker):
         tracker.clear()

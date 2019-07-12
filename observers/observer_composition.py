@@ -20,7 +20,7 @@ class ObserverComposition(ObserverBase):
     def on_error(self, error):
         super().on_error(error)
         for observer in self.observers:
-            observer.on_error()
+            observer.on_error(error)
 
     def __init__(self, observers):
         """"""

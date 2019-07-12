@@ -30,17 +30,34 @@ class BoundingBox(object):
             yield val
 
 
-class TrackedBoundingBox(BoundingBox):
+class LabeledBoundingBox(BoundingBox):
     """"""
 
-    def __init__(self, identifier, x, y, w, h):
+    def __init__(self, label, x, y, w, h):
         """"""
         super().__init__(x, y, w, h)
+        self.label = label
+
+    def __repr__(self):
+        return f'{self.__class__.__name__}(self.label={self.label}, ' \
+            f'self.x={self.x}, ' \
+            f'self.y={self.y}, ' \
+            f'self.w={self.w}, ' \
+            f'self.h={self.h})'
+
+
+class TrackedBoundingBox(LabeledBoundingBox):
+    """"""
+
+    def __init__(self, identifier, label, x, y, w, h):
+        """"""
+        super().__init__(label, x, y, w, h)
         self.identifier = identifier
 
     def __repr__(self):
         return f'{self.__class__.__name__}(identifier={self.identifier}, ' \
-                                           f'self.x={self.x}, ' \
-                                           f'self.y={self.y}, ' \
-                                           f'self.w={self.w}, ' \
-                                           f'self.h={self.h})'
+            f'self.label={self.label}, ' \
+            f'self.x={self.x}, ' \
+            f'self.y={self.y}, ' \
+            f'self.w={self.w}, ' \
+            f'self.h={self.h})'
