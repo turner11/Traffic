@@ -1,11 +1,10 @@
 from collections import OrderedDict
-from copy import copy, deepcopy
 
 
 class Payload(object):
     """"""
 
-    def __init__(self, frame=None, detections=None, key_pressed=None, tracking_rois=None, **args):
+    def __init__(self, frame=None, detections=None, key_pressed=None, tracking_rois=None, i_frame=None, **args):
         """"""
         super().__init__()
         self.original_frame = frame
@@ -16,7 +15,9 @@ class Payload(object):
         self.key_pressed = key_pressed or None
         self.debug_data = OrderedDict()
         self.debug_string = ''
+        self.i_frame = i_frame
         self._args = args
+        self.df = None
 
     def __repr__(self):
         return super().__repr__()

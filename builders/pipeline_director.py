@@ -8,6 +8,8 @@ from functools import partial
 import logging
 
 from builders.pipeline_builders import PipeLineBuilder
+from observers.observer_composition import ObserverComposition
+from observers.plot_observer import PlotObserver
 from observers.save_observer import SaveObserver
 from observers.show_observer import ShowObserver
 from commands.payload import Payload
@@ -34,10 +36,12 @@ class PipelineDirector(object):
             observer.on_error("Error opening video stream or file")
 
         fps = FPS().start()
+        i_frame = -1
         try:
             while cap.isOpened():
                 is_read_success, raw_frame = cap.read()
                 if is_read_success:
+                    i_frame += 1
                     # Using the FPS for getting smooth video while waiting
                     fps.update()
                     fps.stop()
@@ -48,7 +52,8 @@ class PipelineDirector(object):
                     if is_q_pressed:
                         break
 
-                    observer.on_next(Payload(frame=raw_frame, key_pressed=key))
+                    if i_frame % 5 == 0:
+                        observer.on_next(Payload(frame=raw_frame, key_pressed=key, i_frame=i_frame))
 
                 else:
                     observer.on_error('Failed to read video capture')
@@ -69,11 +74,13 @@ class PipelineDirector(object):
         operators = [op.map(cmd) for cmd in commands]
         pipeline = source.pipe(*operators)
 
-        if save_folder:
+        observers = [ShowObserver(title), PlotObserver()]
 
+        if save_folder:
             file_name = f'{save_folder}\\{Path(title).name}.avi'
-            observer = SaveObserver(path=file_name, title=title)
-        else:
-            observer = ShowObserver(title)
+            save_observer = SaveObserver(path=file_name, title=title)
+            observers.append(save_observer)
+
+        observer = ObserverComposition(observers=observers)
 
         return pipeline, observer

@@ -21,6 +21,15 @@ def init_log(log_level=logging.DEBUG):
 
     # create formatter and add it to the handlers
     log_format = '[%(asctime)s][%(name)s][%(levelname)s] %(message)s'
+
+    logging.basicConfig(filemode='a',
+                        format=log_format,
+                        datefmt='%H:%M:%S',
+                        level=logging.ERROR,
+                        stream=sys.stdout,
+                        # filename=file_handler
+                        )
+
     formatter = logging.Formatter(log_format)
 
     # create file handler which logs even debug messages
@@ -31,14 +40,6 @@ def init_log(log_level=logging.DEBUG):
     std_out = logging.StreamHandler(sys.stdout)
     std_out.setFormatter(formatter)
     std_out.setLevel(log_level)
-
-    logging.basicConfig(filemode='a',
-                        format=log_format,
-                        datefmt='%H:%M:%S',
-                        level=logging.ERROR,
-                        stream=std_out,
-                        # filename=file_handler
-                        )
 
     # This for avoiding streams to log to root's stderr, which prints in red in jupyter
     root_logger = logging.getLogger()
