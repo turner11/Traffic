@@ -78,7 +78,7 @@ class PipelineDirector(object):
         pipeline = source.pipe(*operators)
 
         observers = [ShowObserver(title),
-                     PlotDetectionsObserver(),
+                     # PlotDetectionsObserver(),
                      # PlotTrackingObserver()
                      ]
 

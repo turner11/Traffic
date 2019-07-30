@@ -22,7 +22,10 @@ class AutoTrackBuilder(RunTimePipelineBuilder):
         cmd_auto_track = AutoTrackCommand(DetectCommand(self.detector), TrackCommand(self.tracker))
 
         raw_data_layers = [cmd_auto_track]
-        output_layers = [TabularDataCommand(), MedianCommand()]
+        output_layers = [
+            # TabularDataCommand(),
+            # MedianCommand()
+        ]
         augmentation_layers = [DrawBoundingBoxCommand(), DisplayDebugCommand(), DrawStatsCommand()]
 
         commands = raw_data_layers + augmentation_layers + output_layers
