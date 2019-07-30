@@ -9,6 +9,7 @@ from builders.auto_track_builder import AutoTrackBuilder
 from builders.debug_builder import DebugBuilder
 from builders.road_detector_builder import RoadDetectorBuilder
 from common.exceptions import ArgumentException
+from settings import setup
 from settings.all_cameras import data as cameras_dict
 from builders.pipeline_director import PipelineDirector
 
@@ -79,6 +80,9 @@ if __name__ == '__main__':
     parser.add_argument('-s', dest='setup', help='setup folder - e.g. Download weights', required=False, default=None,
                         action='store_true')
     args = parser.parse_args()
+
+    if args.setup:
+        setup.main()
 
     camera_id_arg = args.camera  # args.camera if args.camera >= 0 else None
     yolo_detector_arg = args.yolo
