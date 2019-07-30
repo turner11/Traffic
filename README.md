@@ -28,13 +28,16 @@ cd path/to/repo
 pipenv install 
 ```
 
-For downloading pre trained yolo weights run the [setup.py](https://github.com/turner11/Traffic/blob/master/settings/setup.py)
+For downloading pre trained yolo weights run: 
+```
+python __main__ -s
+```
 
 ## Code execution:
 For running the code run [play.py](https://github.com/turner11/Traffic/blob/master/play.py)
 ```
 cd path/to/repo
-python play.py
+python __main__
 ```
 
 You will be asked to choose a camera from a list.
@@ -42,13 +45,13 @@ You will be asked to choose a camera from a list.
 You can also pass the camera as an argument:
 ```
 cd path/to/repo
-python play.py -c 70
+python __main__ -c 70
 ```
 
 Or specify location of an existing local video file:
 ```
 cd path/to/repo
-python play.py -c /path/to/video/file.avi
+python __main__ -c /path/to/video/file.avi
 ```
 
 #### Commands
