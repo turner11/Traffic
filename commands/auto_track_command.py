@@ -7,9 +7,9 @@ from commands.collect_tracking_commands import TrackDetectionsCommand
 class AutoTrackCommand(FrameCommand):
     """"""
 
-    def __init__(self, detect_command, track_command):
+    def __init__(self, detect_command, track_command, policy_controller=None):
         """"""
-        super().__init__(toggle_key='a')
+        super().__init__(toggle_key='a', policy_controller=policy_controller)
         self.detect_command = detect_command
         self.collect_command = TrackDetectionsCommand()
         self.track_command = track_command

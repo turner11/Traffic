@@ -1,5 +1,6 @@
 import cv2
 from commands.abstract_command import FrameCommand
+from commands.policy_controller import AutoTurnOffPolicy
 from common.types import LabeledBoundingBox
 
 
@@ -29,9 +30,10 @@ class TrackDetectionsCommand(FrameCommand):
 class ManualTrackingCommand(FrameCommand):
     """"""
 
-    def __init__(self):
+    def __init__(self, policy_controller=None):
         """"""
-        super().__init__(toggle_key='m')
+        policy_controller = policy_controller or AutoTurnOffPolicy()
+        super().__init__(toggle_key='m', policy_controller=policy_controller)
         self.is_on = False
 
     def _execute(self, payload):

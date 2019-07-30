@@ -6,9 +6,9 @@ from detection_handlers.detection_drawer import draw_detections, draw_tracked_bo
 class DrawBoundingBoxCommand(FrameCommand):
     """"""
 
-    def __init__(self):
+    def __init__(self, policy_controller=None):
         """"""
-        super().__init__(toggle_key='b')
+        super().__init__(toggle_key='b', policy_controller=policy_controller)
         self.is_on = True
 
     def _execute(self, payload):

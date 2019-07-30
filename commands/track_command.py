@@ -7,9 +7,9 @@ from trackers.opencv_tracker import OpenCvTracker
 class TrackCommand(FrameCommand):
     """"""
 
-    def __init__(self, tracker=None):
+    def __init__(self, tracker=None, policy_controller=None):
         """"""
-        super().__init__(toggle_key='r')
+        super().__init__(toggle_key='r', policy_controller=policy_controller)
         self.tracker = tracker or OpenCvTracker()
         self.bounding_boxes = []
 
