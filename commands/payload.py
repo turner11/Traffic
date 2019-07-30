@@ -3,11 +3,21 @@ from collections import OrderedDict
 
 class Payload(object):
     """"""
+    VEHICLE_LABELS = {'motorbike', 'truck', 'bus', 'car'}
+
+    @property
+    def vehicle_detections(self):
+        return (detection for detection in self.detections if detection.label in self.VEHICLE_LABELS)
+
+    @property
+    def original_frame(self):
+        return self._original_frame
+
 
     def __init__(self, frame=None, detections=None, key_pressed=None, tracking_rois=None, i_frame=None, **args):
         """"""
         super().__init__()
-        self.original_frame = frame
+        self._original_frame = frame.copy()
         self.frame = frame
         self.detections = detections or []
         self.tracking_rois = tracking_rois or []
@@ -17,7 +27,7 @@ class Payload(object):
         self.debug_string = ''
         self.i_frame = i_frame
         self._args = args
-        self.df = None
+        self.dfs = {}
 
     def __repr__(self):
         return super().__repr__()
