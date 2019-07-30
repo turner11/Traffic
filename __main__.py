@@ -61,8 +61,8 @@ def main(camera_id=None, yolo=None, save_folder=None):
     url, title = get_url(camera_id)
 
     # builder = DebugBuilder(yolo=yolo)
-    # builder = AutoTrackBuilder(yolo=yolo)
-    builder = RoadDetectorBuilder(yolo=yolo)
+    builder = AutoTrackBuilder(yolo=yolo)
+    # builder = RoadDetectorBuilder(yolo=yolo)
     director = PipelineDirector(builder)
     pipeline, observer = director.build(url, title.lower(), save_folder=save_folder)
 
