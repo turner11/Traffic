@@ -30,7 +30,7 @@ pipenv install
 
 For downloading pre trained yolo weights run: 
 ```
-python __main__ -s
+python __main__.py -s
 ```
 
 ## Code execution:
@@ -45,13 +45,13 @@ You will be asked to choose a camera from a list.
 You can also pass the camera as an argument:
 ```
 cd path/to/repo
-python __main__ -c 70
+python __main__.py -c 70
 ```
 
 Or specify location of an existing local video file:
 ```
 cd path/to/repo
-python __main__ -c /path/to/video/file.avi
+python __main__.py -c /path/to/video/file.avi
 ```
 
 #### Commands
