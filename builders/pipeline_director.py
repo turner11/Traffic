@@ -7,9 +7,12 @@ from imutils.video import FPS
 from functools import partial
 import logging
 
-from builders.pipeline_builders import PipeLineBuilder
+from builders.abstract_pipeline_builders import PipeLineBuilder
 from observers.observer_composition import ObserverComposition
-from observers.plot_observer import PlotObserver
+
+
+from observers.plot_detections_observer import PlotDetectionsObserver
+from observers.plot_tracking_observer import PlotTrackingObserver
 from observers.save_observer import SaveObserver
 from observers.show_observer import ShowObserver
 from commands.payload import Payload
@@ -45,15 +48,15 @@ class PipelineDirector(object):
                     # Using the FPS for getting smooth video while waiting
                     fps.update()
                     fps.stop()
-                    if True or i_frame % 5 == 0:
-                        wait_time = round(max(fps.fps(), 1))
-                        key = chr(cv2.waitKey(wait_time) & 0xFF)
-                        is_q_pressed = key == 'q'
 
-                        if is_q_pressed:
-                            break
+                    wait_time = round(max(fps.fps(), 1))
+                    key = chr(cv2.waitKey(wait_time) & 0xFF)
+                    is_q_pressed = key == 'q'
 
-                        observer.on_next(Payload(frame=raw_frame, key_pressed=key, i_frame=i_frame))
+                    if is_q_pressed:
+                        break
+
+                    observer.on_next(Payload(frame=raw_frame, key_pressed=key, i_frame=i_frame))
 
                 else:
                     observer.on_error('Failed to read video capture')
@@ -74,7 +77,10 @@ class PipelineDirector(object):
         operators = [op.map(cmd) for cmd in commands]
         pipeline = source.pipe(*operators)
 
-        observers = [ShowObserver(title), PlotObserver()]
+        observers = [ShowObserver(title),
+                     PlotDetectionsObserver(),
+                     # PlotTrackingObserver()
+                     ]
 
         if save_folder:
             file_name = f'{save_folder}\\{Path(title).name}.avi'
