@@ -22,11 +22,11 @@ class BoundingBox(object):
         self.w = w
         self.h = h
 
-    def get_scaled(self, factor):
+    def get_scaled(self, factor: float) -> object:
         w = round(self.w * factor)
         h = round(self.h * factor)
-        x = self.x# + w # +(w * factor)
-        y = self.y# + h # +(h * factor)
+        x = self.x + w # +(w * factor)
+        y = self.y + h # +(h * factor)
 
         return BoundingBox(x, y, w, h)
 
