@@ -5,11 +5,13 @@ from typing import Union
 import pandas as pd
 import logging
 
-from builders.smart_pipeline_builder import SmartPipelineBuilder
+from builders.auto_track_builder import AutoTrackBuilder
+from builders.debug_builder import DebugBuilder
+from builders.road_detector_builder import RoadDetectorBuilder
 from common.exceptions import ArgumentException
 from settings.all_cameras import data as cameras_dict
 from builders.pipeline_director import PipelineDirector
-from builders.full_pipeline_builder import FullPipelineBuilder
+
 from common.utils import init_log
 
 logger = logging.getLogger(__name__)
@@ -58,8 +60,9 @@ def main(camera_id=None, yolo=None, save_folder=None):
     init_log()
     url, title = get_url(camera_id)
 
-    # builder = FullPipelineBuilder(yolo=yolo)
-    builder = SmartPipelineBuilder(yolo=yolo)
+    # builder = DebugBuilder(yolo=yolo)
+    # builder = AutoTrackBuilder(yolo=yolo)
+    builder = RoadDetectorBuilder(yolo=yolo)
     director = PipelineDirector(builder)
     pipeline, observer = director.build(url, title.lower(), save_folder=save_folder)
 
