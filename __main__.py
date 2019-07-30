@@ -75,6 +75,9 @@ if __name__ == '__main__':
     parser.add_argument('-f', dest='folder', help='The folder to save stream to', required=False, default=None)
     parser.add_argument("-y", "--yolo", required=False, help="YOLO version or base path to YOLO directory",
                         default='v3')
+
+    parser.add_argument('-s', dest='setup', help='setup folder - e.g. Download weights', required=False, default=None,
+                        action='store_true')
     args = parser.parse_args()
 
     camera_id_arg = args.camera  # args.camera if args.camera >= 0 else None
