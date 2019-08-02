@@ -4,7 +4,7 @@ from commands.abstract_command import FrameCommand
 from commands.payload import Payload
 
 TrackingRowData = namedtuple('TrackingRowData', ['id', 'frame', 'x', 'y', 'w', 'h', 'label'])
-DetectionRowData = namedtuple('DetectionRowData', ['frame', 'x', 'y', 'w', 'h'])
+DetectionRowData = namedtuple('DetectionRowData', ['frame', 'x', 'y', 'w', 'h', 'label'])
 
 
 class TabularDataCommand(FrameCommand):
@@ -42,10 +42,13 @@ class TabularDataCommand(FrameCommand):
         return df_tracking
 
     def get_detection_data(self, payload):
-        detection_boxes = [d.bounding_box for d in payload.vehicle_detections]
-        rows = [DetectionRowData(frame=payload.i_frame, x=b.x, y=b.y, w=b.w, h=b.h)
-                for b
-                in detection_boxes]
+        detections = payload.vehicle_detections
+
+        rows = [DetectionRowData(frame=payload.i_frame,
+                                 x=d.bounding_box.x, y=d.bounding_box.y, w=d.bounding_box.w, h=d.bounding_box.h,
+                                 label=d.label)
+                for d
+                in detections]
 
         curr_df_detections = pd.DataFrame(rows)
         df_detections = pd.concat([self.df_detections, curr_df_detections], sort=False) \
