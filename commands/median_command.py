@@ -66,7 +66,7 @@ class MedianCommand(FrameCommand):
         return payload
         src = median / 255
 
-        from experimental import demo_erosion_dilatation
+        from experimental.experimental import demo_erosion_dilatation
         src = (1-src) *255
         demo_erosion_dilatation(src, iterations=2)
 
