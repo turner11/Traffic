@@ -1,4 +1,8 @@
+import time
 from abc import ABC, abstractmethod
+
+from datetime import timedelta
+
 from commands.payload import Payload
 
 
@@ -37,11 +41,18 @@ class FrameCommand(ABC):
         elif payload.key_pressed in self.subscribed_keys:
             self.subscribed_key_presses(payload.key_pressed, payload)
 
+        elapsed_time = None
         # Execute
         if self.is_on:
+            start_time = time.time()
             payload = self._execute(payload)
+            elapsed_time = timedelta(seconds=time.time() - start_time)
 
         debug_data = self.get_debug_data()
+
+        if elapsed_time is not None:
+            debug_data = f'{debug_data}; (elapsed: {elapsed_time})'
+
         payload.debug_data[self.__class__.__name__] = debug_data
 
         # Apply policy
