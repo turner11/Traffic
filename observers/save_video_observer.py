@@ -7,7 +7,7 @@ from observers.show_observer import ShowObserver
 logger = logging.getLogger(__name__)
 
 
-class SaveObserver(ShowObserver):
+class SaveVideoObserver(ShowObserver):
 
     def __init__(self, path, display_video=True, size=None, title='Saving stream'):
         """"""
