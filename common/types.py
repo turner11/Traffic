@@ -25,8 +25,8 @@ class BoundingBox(object):
     def get_scaled(self, factor: float) -> object:
         w = round(self.w * factor)
         h = round(self.h * factor)
-        x = self.x + w # +(w * factor)
-        y = self.y + h # +(h * factor)
+        x = self.x + w  # +(w * factor)
+        y = self.y + h  # +(h * factor)
 
         return BoundingBox(x, y, w, h)
 
@@ -52,6 +52,21 @@ class LabeledBoundingBox(BoundingBox):
             f'self.y={self.y}, ' \
             f'self.w={self.w}, ' \
             f'self.h={self.h})'
+
+
+class Detection(object):
+    """"""
+
+    def __init__(self, label, bounding_box, confidence):
+        """"""
+        super().__init__()
+        self.label = label
+        self.bounding_box = bounding_box
+        self.confidence = confidence
+
+    def __repr__(self):
+        return f'{self.__class__.__name__}(label={self.label}, bounding_box={self.bounding_box}, confidence={self.confidence})'
+
 
 class TrackedBoundingBox(LabeledBoundingBox):
     """"""
