@@ -40,16 +40,18 @@ class PlotDetectionsObserver(ObserverBase):
         # sns.scatterplot(x='x', y='y', hue='frame', data=df)
         # sns.scatterplot(x='x', y='y', data=df)
 
-        ## adjust limits
+        # adjust limits
         # max_y = max(df.y)
         # max_x = max(df.x)
 
         vehicle_detections = list(payload.vehicle_detections)
 
-        from common.types import BoundingBox
-        boxes = (d.bounding_box for d in vehicle_detections)
+        boxes = [d.bounding_box for d in vehicle_detections]
         # boxes = (b.get_scaled(0.5) for b in boxes)
-        boxes = (BoundingBox(b.x, b.y + b.h, b.w, int(round(b.h * 0.2))) for b in boxes)
+
+        # This does a pretty good job at catching bottom of vehicle
+        # from common.types import BoundingBox
+        # boxes = (BoundingBox(b.x, b.y + b.h, b.w, int(round(b.h * 0.2))) for b in boxes)
 
         for box in boxes:
             # Create a Rectangle patch
