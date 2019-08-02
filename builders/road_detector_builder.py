@@ -27,8 +27,10 @@ class RoadDetectorBuilder(RunTimePipelineBuilder):
         cmd_detect = DetectCommand(affective_detector, policy_controller=EveryNFramesPolicy(n=detection_n_frames))
 
         raw_data_layers = [cmd_detect]
-        data_aggregation_layers = [TabularDataCommand()]
-        processing_layers = [MedianCommand(policy_controller=EveryNFramesPolicy(n=median_n_frames))]
+        data_aggregation_layers = [TabularDataCommand(policy_controller=EveryNFramesPolicy(n=detection_n_frames))]
+        processing_layers = [
+            # MedianCommand(policy_controller=EveryNFramesPolicy(n=median_n_frames))
+        ]
         augmentation_layers = [DrawBoundingBoxCommand(), DisplayDebugCommand(), DrawStatsCommand()]
 
         commands = raw_data_layers + data_aggregation_layers + processing_layers + augmentation_layers
