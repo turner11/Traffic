@@ -1,4 +1,3 @@
-from collections import namedtuple
 from pathlib import Path
 from typing import Union
 import numpy as np
@@ -6,11 +5,10 @@ import argparse
 import cv2
 import logging
 
-from common.types import BoundingBox
+from common.types import BoundingBox, Detection
 from yolo_detectors.configurations import yolo_detector_folders
 from yolo_detectors.yolo_config_folder import YoloFolder
 
-Detection = namedtuple('Detection', ['label', 'confidence', 'bounding_box'])
 logger = logging.getLogger(__name__)
 
 DEFAULT_CONFIDENCE = 0.5
@@ -25,7 +23,7 @@ class YoloDetector(object):
     def __init__(self, yolo_folder: YoloFolder,
                  min_confidence: float = DEFAULT_CONFIDENCE,
                  threshold: float = DEFAULT_THRESHOLD,
-                 blob_size: (int, int) = DEFAULT_BLOB_SIZE ,
+                 blob_size: (int, int) = DEFAULT_BLOB_SIZE,
                  use_gpu: bool = True) -> None:
         """
         :param yolo_folder: the yolo folder instance
@@ -100,17 +98,15 @@ class YoloDetector(object):
 
         # initialize our lists of detected bounding boxes, confidences, and
         # class IDs, respectively
-        boxes = []
-        confidences = []
-        class_ids = []
+        initial_detections = []
 
         # loop over each of the layer outputs
         for output in layer_outputs:
             # loop over each of the detections
-            for detection in output:
+            for detection_vector in output:
                 # extract the class ID and confidence (i.e., probability) of
                 # the current object detection
-                scores = detection[5:]
+                scores = detection_vector[5:]
                 class_id = np.argmax(scores)
                 confidence = scores[class_id]
 
@@ -122,7 +118,7 @@ class YoloDetector(object):
                     # size of the image, keeping in mind that YOLO actually
                     # returns the center (x, y)-coordinates of the bounding
                     # box followed by the boxes' width and height
-                    box = detection[0:4] * np.array([W, H, W, H])
+                    box = detection_vector[0:4] * np.array([W, H, W, H])
                     (centerX, centerY, width, height) = box.astype("int")
 
                     # use the center (x, y)-coordinates to derive the top and
@@ -130,31 +126,18 @@ class YoloDetector(object):
                     x = int(centerX - (width / 2))
                     y = int(centerY - (height / 2))
 
-                    # update our list of bounding box coordinates, confidences,
-                    # and class IDs
-                    boxes.append([x, y, int(width), int(height)])
-                    confidences.append(float(confidence))
-                    class_ids.append(class_id)
+                    label = labels[class_id]
+                    bounding_box = BoundingBox(x, y, int(width), int(height))
 
-        # apply non-maxima suppression to suppress weak, overlapping bounding
-        # boxes
-        idxs = cv2.dnn.NMSBoxes(boxes, confidences, min_confidence, threshold)
+                    detection = Detection(label, bounding_box, float(confidence))
+                    initial_detections.append(detection)
 
-        detections = []
-        # ensure at least one detection exists
-        if len(idxs) > 0:
-            # loop over the indexes we are keeping
-            for i in idxs.flatten():
-                # extract the bounding box coordinates
-                (x, y) = (boxes[i][0], boxes[i][1])
-                (w, h) = (boxes[i][2], boxes[i][3])
-
-                class_id = class_ids[i]
-                label = labels[class_id]
-                confidence = confidences[i]
-                bounding_box = BoundingBox(x, y, w, h)
-                detection = Detection(label, confidence, bounding_box)
-                detections.append(detection)
+        # apply non-maxima suppression to suppress weak, overlapping bounding boxes
+        boxes_as_list = [list(b.bounding_box) for b in initial_detections]
+        confidences = [b.confidence for b in initial_detections]
+        idxs = cv2.dnn.NMSBoxes(boxes_as_list, confidences, min_confidence, threshold)
+        idxs = idxs.flatten() if len(idxs) else []
+        detections = [d for i, d in enumerate(initial_detections) if i in idxs]
 
         return detections
 
