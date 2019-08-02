@@ -7,6 +7,10 @@ logger = logging.getLogger(__name__)
 
 class ObserverComposition(ObserverBase):
     """"""
+    def __init__(self, observers):
+        """"""
+        super().__init__()
+        self.observers = observers
 
     def on_next(self, payload):
         for observer in self.observers:
@@ -22,10 +26,7 @@ class ObserverComposition(ObserverBase):
         for observer in self.observers:
             observer.on_error(error)
 
-    def __init__(self, observers):
-        """"""
-        super().__init__()
-        self.observers = observers
+
 
     def __repr__(self):
         return super().__repr__()
