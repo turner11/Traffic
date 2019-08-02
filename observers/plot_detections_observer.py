@@ -60,8 +60,9 @@ class PlotDetectionsObserver(ObserverBase):
             # Add the patch to the Axes
             self.ax.add_patch(rect)
 
-        pause_time = 0.001
-        plt.pause(pause_time)
+        if len(boxes):
+            pause_time = 0.0000001
+            plt.pause(pause_time)
 
     def on_completed(self):
         super().on_completed()
