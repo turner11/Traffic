@@ -13,7 +13,6 @@ class Payload(object):
     def original_frame(self):
         return self._original_frame
 
-
     def __init__(self, frame=None, detections=None, key_pressed=None, tracking_rois=None, i_frame=None, **args):
         """"""
         super().__init__()
