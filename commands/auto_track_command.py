@@ -1,5 +1,3 @@
-import cv2
-
 from commands.abstract_command import FrameCommand
 from commands.collect_tracking_commands import TrackDetectionsCommand
 
