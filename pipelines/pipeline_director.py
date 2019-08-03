@@ -6,6 +6,7 @@ from imutils.video import FPS
 from functools import partial
 import logging
 
+from observers.mesh_view_observer import MeshViewObserver
 from observers.observer_composition import ObserverComposition
 from observers.plot_detections_observer import PlotDetectionsObserver
 from observers.save_tabular_data_observer import SaveTabularDataObserver
@@ -79,18 +80,19 @@ def _get_pipeline(get_operators, url, title=None, save_folder=None, **args):
     source = rx.create(source_func)
     pipeline = source.pipe(*operators)
 
-    observers = [ShowObserver(title),
+    observers = [MeshViewObserver(title),
+                    # ShowObserver(title),
                  # PlotDetectionsObserver(),
                  # PlotTrackingObserver()
                  ]
 
     observer = ObserverComposition(observers=observers)
-    if save_folder:
-        path = Path(save_folder)
-
-        file_name = path / (title + '.avi')
-        save_video_observer = SaveVideoObserver(path=file_name, title=title)
-        observers.append(save_video_observer)
+    # if save_folder:
+    #     path = Path(save_folder)
+    #
+    #     file_name = path / (title + '.avi')
+    #     save_video_observer = SaveVideoObserver(path=file_name, title=title)
+    #     observers.append(save_video_observer)
 
         # file_name = path / 'detections.prqt'
         # save_data_observer = SaveTabularDataObserver(file_name)

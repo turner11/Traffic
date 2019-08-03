@@ -1,23 +1,45 @@
-import cv2
-
+import os
+import pandas as pd
+import pyarrow as pa
+import pyarrow.parquet as pq
+from pathlib import Path
+import matplotlib.patches as patches
+import matplotlib.pyplot as plt
+import numpy as np
+from cv2 import cv2
 from commands.abstract_command import FrameCommand
-from commands.collect_tracking_commands import TrackDetectionsCommand
+from image_process_helpers.road_roi_detector import get_rois
 
 
 class FindRoadRoiCommand(FrameCommand):
     """"""
 
-    def __init__(self, detect_command, track_command, policy_controller=None):
+    def __init__(self, policy_controller=None):
         """"""
-        super().__init__(toggle_key='a', policy_controller=policy_controller)
-        self.detect_command = detect_command
-        self.collect_command = TrackDetectionsCommand()
-        self.track_command = track_command
+        super().__init__(toggle_key='o', policy_controller=policy_controller)
         self.is_on = True
+        self.detections_count = 0
+        self.last_rois = pd.DataFrame()
 
     def _execute(self, payload):
-        pass
+        df_detections = payload.dfs.get('detections', pd.DataFrame()).drop_duplicates()
+        if self.detections_count < len(df_detections) :
+            self.detections_count = len(df_detections)
+            df_extremes = get_rois(df_detections)
+            self.last_rois = df_extremes
+
+        if len(self.last_rois):
+            # WIP: DEBUG
+            frame = payload.frame
+            from image_process_helpers.road_roi_detector import lay_rects_on_image
+            marked_frame = lay_rects_on_image(frame, self.last_rois,filled=False)
+
+
+            payload.viewables['road_rois'] = marked_frame
+
         return payload
 
     def get_debug_data(self) -> str:
         return super().get_debug_data()
+
+

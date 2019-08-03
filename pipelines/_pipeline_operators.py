@@ -6,6 +6,7 @@ from commands.detect_command import DetectCommand
 from commands.display_debug_command import DisplayDebugCommand
 from commands.draw_bounding_box_command import DrawBoundingBoxCommand
 from commands.draw_stats_command import DrawStatsCommand
+from commands.find_road_roi_command import FindRoadRoiCommand
 from commands.median_command import MedianCommand
 from commands.policy_controller import EveryNFramesPolicy
 from commands.to_tabular_data_command import TabularDataCommand
@@ -61,14 +62,16 @@ def _get_road_roi_detector_operators(detector=None, tracker=None, **args):
     str(tracker)
 
     detection_n_frames = 3 * 28
-    median_n_frames = 1 * 28
+    roi_n_frames = 1 * 28
 
     cmd_detect = DetectCommand(affective_detector, policy_controller=EveryNFramesPolicy(n=detection_n_frames))
 
     raw_data_layers = [cmd_detect]
     data_aggregation_layers = [TabularDataCommand()]
+    # policy_controller = EveryNFramesPolicy(n=roi_n_frames)
     processing_layers = [
-        MedianCommand(policy_controller=EveryNFramesPolicy(n=median_n_frames))
+        # MedianCommand(policy_controller=EveryNFramesPolicy(n=median_n_frames)),
+        FindRoadRoiCommand()
     ]
 
     commands = raw_data_layers + data_aggregation_layers + processing_layers

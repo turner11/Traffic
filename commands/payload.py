@@ -27,6 +27,7 @@ class Payload(object):
         self.i_frame = i_frame
         self._args = args
         self.dfs = {}
+        self.viewables = {}
 
     def __repr__(self):
         return super().__repr__()

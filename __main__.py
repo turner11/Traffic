@@ -61,8 +61,9 @@ def main(camera_id=None, yolo=None, save_folder=None):
 
     # get_debug_pipeline
     # get_road_roi_pipeline
+    # get_auto_track_pipeline
 
-    pipeline, observer = get_debug_pipeline(url, yolo=yolo, title=title.lower(), save_folder=save_folder)
+    pipeline, observer = get_road_roi_pipeline(url, yolo=yolo, title=title.lower(), save_folder=save_folder)
 
     pipeline.subscribe(observer)
 
