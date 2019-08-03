@@ -5,13 +5,10 @@ from typing import Union
 import pandas as pd
 import logging
 
-from builders.auto_track_builder import AutoTrackBuilder
-from builders.debug_builder import DebugBuilder
-from builders.road_detector_builder import RoadDetectorBuilder
 from common.exceptions import ArgumentException
 from settings import setup
 from settings.all_cameras import data as cameras_dict
-from builders.pipeline_director import PipelineDirector
+from pipelines.pipeline_director import get_auto_track_pipeline, get_debug_pipeline, get_road_roi_pipeline
 
 from common.utils import init_log
 
@@ -23,7 +20,8 @@ def get_url(camera_id: Union[int, str] = None):
         if Path(str(camera_id)).exists():
             # This allows specifying a file
             path = str(camera_id)
-            return path, path
+            title = Path(path).name.split('.')[0]
+            return path, title
         if not str(camera_id).isdigit():
             raise ArgumentException(f'camera_id must be a valid path or an integer '
                                     f'(got {type(camera_id).__name__} - {camera_id})')
@@ -61,11 +59,10 @@ def main(camera_id=None, yolo=None, save_folder=None):
     init_log()
     url, title = get_url(camera_id)
 
-    # builder = DebugBuilder(yolo=yolo)
-    builder = AutoTrackBuilder(yolo=yolo)
-    # builder = RoadDetectorBuilder(yolo=yolo)
-    director = PipelineDirector(builder)
-    pipeline, observer = director.build(url, title.lower(), save_folder=save_folder)
+    # get_debug_pipeline
+    # get_road_roi_pipeline
+
+    pipeline, observer = get_debug_pipeline(url, yolo=yolo, title=title.lower(), save_folder=save_folder)
 
     pipeline.subscribe(observer)
 

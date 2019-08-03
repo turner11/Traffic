@@ -54,7 +54,7 @@ class PlotTrackingObserver(ObserverBase):
                     line.set_xdata(x_vec)
                     line.set_ydata(y1_data)
 
-            pause_time = 0.001
+            pause_time = 0.00000001
             plt.pause(pause_time)
 
             # plt.show(block=True)

@@ -16,10 +16,11 @@ class TrackDetectionsCommand(FrameCommand):
     def _execute(self, payload):
         relevant_detections = (detection for detection in payload.detections if detection.label in self.LABELS_TO_TRACK)
         # boxes =(LabeledBoundingBox(detection.label, *detection.bounding_box) for detection in relevant_detections)
+        boxes = relevant_detections
         # half size
-        factor = 1/2
-        boxes = ((detection.label, detection.bounding_box.get_scaled(factor)) for detection in relevant_detections)
-        boxes = (LabeledBoundingBox(lbl, *bb) for lbl, bb in boxes)
+        # factor = 1/2
+        # boxes = ((detection.label, detection.bounding_box.get_scaled(factor)) for detection in boxes)
+        # boxes = (LabeledBoundingBox(lbl, *bb) for lbl, bb in boxes)
         payload.tracking_rois.extend(boxes)
 
         # Don't start marking at every frame
@@ -44,8 +45,8 @@ class ManualTrackingCommand(FrameCommand):
 
         has_bounding_box = any(v != 0 for v in init_bounding_box)
         if has_bounding_box:
-            LabeledBoundingBox('manual', *init_bounding_box)
-            payload.tracking_rois.append(init_bounding_box)
+            bounding_box = LabeledBoundingBox('manual', *init_bounding_box)
+            payload.tracking_rois.append(bounding_box)
 
         # Don't start marking at every frame
         self.is_on = False

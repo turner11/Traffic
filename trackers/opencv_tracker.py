@@ -56,7 +56,7 @@ class OpenCvTracker(object):
         for tracker_id, tracker in trackers.items():
             # grab the new bounding box coordinates of the objects
             (success, box) = tracker.update(frame)
-            results[tracker] = success
+            results[tracker_id] = success
             label = self.tracker_labels.get(tracker_id, '')
 
             # check to see if the tracking was a success
@@ -65,9 +65,9 @@ class OpenCvTracker(object):
                 bb = TrackedBoundingBox(tracker_id, label, x, y, w, h)
                 boxes.append(bb)
 
-        for tracker, success in results.items():
+        for tracker_id, success in results.items():
             if not success:
-                self.remove_tracker(tracker)
+                self.remove_tracker(tracker_id)
 
         success = len(results) == 0 or any(s for s in results.values())
         return success, boxes
@@ -82,12 +82,11 @@ class OpenCvTracker(object):
         self.trackers[tracker_id] = tracker
         self.tracker_labels[tracker_id] = label
 
-    def remove_tracker(self, tracker):
+    def remove_tracker(self, tracker_id):
+        tracker = self.trackers[tracker_id]
         tracker.clear()
-        for tracker_id, curr_tracker in list(self.trackers.items()):
-            if tracker == curr_tracker:
-                del self.trackers[tracker_id]
+        del self.trackers[tracker_id]
 
     def reset(self):
-        for tracker in list(self.trackers.values()):
+        for tracker in list(self.trackers.keys()):
             self.remove_tracker(tracker)

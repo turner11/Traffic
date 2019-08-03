@@ -67,6 +67,9 @@ class Detection(object):
     def __repr__(self):
         return f'{self.__class__.__name__}(label={self.label}, bounding_box={self.bounding_box}, confidence={self.confidence})'
 
+    def __iter__(self):
+        return iter(self.bounding_box)
+
 
 class TrackedBoundingBox(LabeledBoundingBox):
     """"""
@@ -83,3 +86,5 @@ class TrackedBoundingBox(LabeledBoundingBox):
             f'self.y={self.y}, ' \
             f'self.w={self.w}, ' \
             f'self.h={self.h})'
+
+
