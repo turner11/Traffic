@@ -28,7 +28,7 @@ class PlotDetectionsObserver(ObserverBase):
         plt.show()
 
     def on_next(self, payload):
-        df = payload.dfs.get('detections', pd.DataFrame()).drop_duplicates()
+        df = payload.get_session_df('detections', pd.DataFrame()).drop_duplicates()
         plt.title(f'{len(df)} Detections')
 
         h, w = payload.frame.shape[0], payload.frame.shape[1]

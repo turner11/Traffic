@@ -22,24 +22,24 @@ class FindRoadRoiCommand(FrameCommand):
         self.last_rois = pd.DataFrame()
 
     def _execute(self, payload):
-        df_detections = payload.dfs.get('detections', pd.DataFrame()).drop_duplicates()
-        if self.detections_count < len(df_detections) :
+        df_detections = payload.session['dfs'].get('detections', pd.DataFrame()).drop_duplicates()
+        if self.detections_count < len(df_detections):
             self.detections_count = len(df_detections)
             df_extremes = get_rois(df_detections)
             self.last_rois = df_extremes
 
+        payload.dfs['road_rois'] = self.last_rois
+
         if len(self.last_rois):
-            # WIP: DEBUG
+            # Add frame for debugging purposes
             frame = payload.frame
             from image_process_helpers.road_roi_detector import lay_rects_on_image
-            marked_frame = lay_rects_on_image(frame, self.last_rois,filled=False)
-
+            marked_frame = lay_rects_on_image(frame, self.last_rois, filled=False)
 
             payload.viewables['road_rois'] = marked_frame
+
 
         return payload
 
     def get_debug_data(self) -> str:
         return super().get_debug_data()
-
-

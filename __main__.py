@@ -12,6 +12,8 @@ from pipelines.pipeline_director import get_auto_track_pipeline, get_debug_pipel
 
 from common.utils import init_log
 
+# pd.set_option('display.max_columns', 500)
+# pd.set_option('display.width', 1000)
 logger = logging.getLogger(__name__)
 
 

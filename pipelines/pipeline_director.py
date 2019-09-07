@@ -6,15 +6,44 @@ from imutils.video import FPS
 from functools import partial
 import logging
 
+from tqdm import tqdm
+
 from observers.mesh_view_observer import MeshViewObserver
 from observers.observer_composition import ObserverComposition
 from observers.plot_detections_observer import PlotDetectionsObserver
 from observers.save_tabular_data_observer import SaveTabularDataObserver
 from observers.save_video_observer import SaveVideoObserver
 from observers.show_observer import ShowObserver
+import time
 from commands.payload import Payload
 
 logger = logging.getLogger(__name__)
+
+
+def _get_stream_fps(stream, num_frames=120):
+    # Number of frames to capture
+
+    fps = stream.get(cv2.CAP_PROP_FPS)
+    return fps
+    logging.debug(f"Capturing {num_frames} frames for fps calculation")
+    # Start time
+    start = time.time()
+
+    # Grab a few frames
+    for i in tqdm(range(0, num_frames)):
+        ret, frame = stream.read()
+
+    # End time
+    end = time.time()
+
+    # Time elapsed
+    seconds = end - start
+    logging.debug(f"Time taken : {seconds:.4f} seconds")
+
+    # Calculate frames per second
+    fps = num_frames / seconds
+    logging.debug(f"Estimated frames per second : {fps}")
+    return fps
 
 
 def url_to_source_function(url):
@@ -22,6 +51,9 @@ def url_to_source_function(url):
         cap = cv2.VideoCapture(url)
         if not cap.isOpened():
             observer.on_error("Error opening video stream or file")
+
+        stream_fps = _get_stream_fps(cap)
+        session = {'fps': stream_fps, 'dfs': {}}
 
         fps = FPS().start()
         i_frame = -1
@@ -41,7 +73,8 @@ def url_to_source_function(url):
                     if is_q_pressed:
                         break
 
-                    observer.on_next(Payload(frame=raw_frame, key_pressed=key, i_frame=i_frame))
+                    payload = Payload(frame=raw_frame, session=session, key_pressed=key, i_frame=i_frame)
+                    observer.on_next(payload)
 
                 else:
                     observer.on_error('Failed to read video capture')
@@ -81,7 +114,7 @@ def _get_pipeline(get_operators, url, title=None, save_folder=None, **args):
     pipeline = source.pipe(*operators)
 
     observers = [MeshViewObserver(title),
-                    # ShowObserver(title),
+                 # ShowObserver(title),
                  # PlotDetectionsObserver(),
                  # PlotTrackingObserver()
                  ]
@@ -94,8 +127,8 @@ def _get_pipeline(get_operators, url, title=None, save_folder=None, **args):
     #     save_video_observer = SaveVideoObserver(path=file_name, title=title)
     #     observers.append(save_video_observer)
 
-        # file_name = path / 'detections.prqt'
-        # save_data_observer = SaveTabularDataObserver(file_name)
-        # observers.append(save_data_observer)
+    # file_name = path / 'detections.prqt'
+    # save_data_observer = SaveTabularDataObserver(file_name)
+    # observers.append(save_data_observer)
 
     return pipeline, observer

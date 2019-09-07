@@ -27,7 +27,7 @@ class PlotTrackingObserver(ObserverBase):
         plt.show()
 
     def on_next(self, payload):
-        df = payload.dfs.get('tracking', pd.DataFrame())
+        df = payload.get_session_df('tracking', pd.DataFrame())
         if len(df) > 0:
             plt.title(f'{len(df["id"].drop_duplicates())} tracked items')
 
