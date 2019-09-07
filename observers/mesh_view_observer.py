@@ -2,6 +2,8 @@ import cv2
 import numpy as np
 import logging
 
+from commands.display_debug_command import DisplayDebugCommand
+from commands.draw_stats_command import DrawStatsCommand
 from observers.abstract_observer import ObserverBase
 
 logger = logging.getLogger(__name__)
@@ -13,7 +15,8 @@ class MeshViewObserver(ObserverBase):
         """"""
         super().__init__()
         self.title = title
-
+        self.cmd_displayDebug = DisplayDebugCommand()
+        self.cmd_drawStats = DrawStatsCommand()
     def on_next(self, payload):
         frame = payload.frame
         viewables = list(payload.viewables.values())
@@ -51,6 +54,10 @@ class MeshViewObserver(ObserverBase):
 
             image = res
 
+        payload.frame = image
+        payload = self.cmd_displayDebug.execute(payload)
+        payload = self.cmd_drawStats.execute(payload)
+
         cv2.namedWindow(self.title, cv2.WINDOW_NORMAL)
-        cv2.imshow(self.title, image)
+        cv2.imshow(self.title, payload.frame)
 

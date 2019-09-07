@@ -1,24 +1,27 @@
 from rx import operators as op
 
 from commands.auto_track_command import AutoTrackCommand
-from commands.collect_tracking_commands import TrackDetectionsCommand, ManualTrackingCommand
+from commands.collect_tracking_commands import SetDetectionsForTrackingCommand, ManualTrackingCommand
 from commands.detect_command import DetectCommand
-from commands.display_debug_command import DisplayDebugCommand
 from commands.draw_bounding_box_command import DrawBoundingBoxCommand
-from commands.draw_stats_command import DrawStatsCommand
+from commands.filter_detections_command import FilterDetectionCommandByRois
 from commands.find_road_roi_command import FindRoadRoiCommand
-from commands.median_command import MedianCommand
-from commands.policy_controller import EveryNFramesPolicy
-from commands.to_tabular_data_command import TabularDataCommand
+from commands.invalidate_trackers_command import InvalidateTrackersCommand
+from commands.policy_controller import EveryNSecondsPolicy, DelayedStartPolicy  # EveryNFramesPolicy
 from commands.track_command import TrackCommand
 from common.exceptions import ArgumentException
 from yolo_detectors.yolo_detector import YoloDetector
 
 
+# from commands.display_debug_command import DisplayDebugCommand
+# from commands.draw_stats_command import DrawStatsCommand
+# from commands.median_command import MedianCommand
+
+
 def append_augmentation_commands(func):
     def wrapper(*args, **kwargs):
         augmentation_operators = [op.map(cmd) for cmd
-                                  in (DrawBoundingBoxCommand(), DisplayDebugCommand(), DrawStatsCommand())]
+                                  in (DrawBoundingBoxCommand(),)]
         operators = func(*args, **kwargs)
         return operators + augmentation_operators
 
@@ -46,12 +49,13 @@ def _get_debug_operators(detector=None, tracker=None, **args):
     detector = detector or YoloDetector.factory(yolo=args.get('yolo'))
     cmd_detect = DetectCommand(detector)
     cmd_track = TrackCommand(tracker)
-    raw_data_layers = [cmd_detect, TrackDetectionsCommand(), ManualTrackingCommand(), cmd_track]
+    raw_data_layers = [cmd_detect, SetDetectionsForTrackingCommand(), ManualTrackingCommand(), cmd_track]
 
     commands = raw_data_layers
     operators = [op.map(cmd) for cmd in commands]
 
     return operators
+
 
 @append_augmentation_commands
 def _get_road_roi_detector_operators(detector=None, tracker=None, **args):
@@ -61,20 +65,28 @@ def _get_road_roi_detector_operators(detector=None, tracker=None, **args):
 
     str(tracker)
 
-    detection_n_frames = 3 * 28
-    roi_n_frames = 1 * 28
+    detection_n_seconds = 3
+    delay_seconds = 60.
 
-    cmd_detect = DetectCommand(affective_detector, policy_controller=EveryNFramesPolicy(n=detection_n_frames))
+    cmd_detect = DetectCommand(affective_detector, policy_controller=EveryNSecondsPolicy(n=detection_n_seconds))
 
     raw_data_layers = [cmd_detect]
-    data_aggregation_layers = [TabularDataCommand()]
-    # policy_controller = EveryNFramesPolicy(n=roi_n_frames)
+
     processing_layers = [
         # MedianCommand(policy_controller=EveryNFramesPolicy(n=median_n_frames)),
-        FindRoadRoiCommand()
+        FindRoadRoiCommand(),
+        FilterDetectionCommandByRois(),
+        SetDetectionsForTrackingCommand(),
+        TrackCommand(tracker, policy_controller=DelayedStartPolicy(n_seconds=delay_seconds)),
+        InvalidateTrackersCommand(policy_controller=DelayedStartPolicy(n_seconds=delay_seconds))
+
     ]
 
-    commands = raw_data_layers + data_aggregation_layers + processing_layers
+    commands = raw_data_layers + processing_layers
+
+    for cmd in commands:
+        cmd.is_on = True
+
     operators = [op.map(cmd) for cmd in commands]
 
     return operators

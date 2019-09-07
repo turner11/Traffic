@@ -12,11 +12,12 @@ class DrawStatsCommand(FrameCommand):
         self.started = False
         self.font = cv2.FONT_HERSHEY_TRIPLEX
         self.color = (0, 255, 0)
-        self.font_scale = 0.6
+        self.font_scale = 0.4
         self.is_on = True
 
     def _execute(self, payload):
         frame = payload.frame
+        debug_string = payload.debug_string
         if not self.started:
             self.fps = FPS().start()
             self.started = True
@@ -29,9 +30,8 @@ class DrawStatsCommand(FrameCommand):
 
             info = [
                        ("FPS", "{:.2f}".format(fps.fps())),
-                   ] + [('', payload.debug_string)]
+                   ] + [('', debug_string)]
 
-            # output_frame = imutils.resize(frame, width=500)
             (H, W) = frame.shape[:2]
             # loop over the info tuples and draw them on our frame
             for (i, (k, v)) in enumerate(info):
@@ -39,7 +39,7 @@ class DrawStatsCommand(FrameCommand):
                 for j, row_text in enumerate(text.split('\n')):
                     offset = ((i+j) * 20)
                     org = (10, H - (offset + 20))
-                    cv2.putText(frame, row_text, org,self.font, self.font_scale, self.color, thickness=1)
+                    cv2.putText(frame, row_text, org, self.font, self.font_scale, self.color, thickness=1)
         payload.frame = frame
         return payload
 

@@ -23,8 +23,11 @@ def width_and_heights_to_points(df):
 def lay_rects_on_image(imgae, df, filled=True):
     img = imgae.copy()
     for i, row in df.iterrows():
-        pt1 = (int(row.x), int(row.y))
-        pt2 = (int(row.x2), int(row.y2))
+        try:
+            pt1 = (int(row.x), int(row.y))
+            pt2 = (int(row.x2), int(row.y2))
+        except ValueError:
+            continue  # cannot convert float NaN to integer
         if filled:
             img = cv2.rectangle(img, pt1, pt2, 1, cv2.FILLED)
         else:
@@ -89,7 +92,6 @@ def main():
 
     plt.imshow(stacked, cmap='gray', interpolation='nearest')
     plt.show(block=True)
-
 
 
 if __name__ == '__main__':
