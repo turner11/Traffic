@@ -1,7 +1,7 @@
+import cv2
+import logging
 import itertools
 from typing import List, Tuple
-
-import cv2
 from collections import OrderedDict
 
 import numpy as np
@@ -24,6 +24,7 @@ OPENCV_OBJECT_TRACKERS = OrderedDict([
 # MOSSE: Extremely fast but not as accurate as either KCF or CSRT
 id_generator = itertools.count()
 
+logger = logging.getLogger(__name__)
 class TrackingResults(object):
     """"""
 
@@ -99,7 +100,9 @@ class OpenCvTracker(object):
 
     def remove_tracker(self, tracker_id):
         tracker = self.trackers[tracker_id]
-        tracker.clear()
+        logger.debug(f'Clearing tracker ({tracker_id})')
+        # tracker.clear()
+
         del self.trackers[tracker_id]
 
     def reset(self):
