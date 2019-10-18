@@ -32,7 +32,7 @@ class EveryNFramesPolicy(PolicyController):
 
 class EveryNSecondsPolicy(PolicyController):
 
-    def __init__(self, n):
+    def __init__(self, n: float) -> None:
         super().__init__()
         self.n = n
 
