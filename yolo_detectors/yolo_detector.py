@@ -58,11 +58,11 @@ class YoloDetector(object):
             yolo_folder = yolo
         else:
             if Path(yolo).exists():
-                logger.debug(f'Using yolo path: {yolo}')
+                logger.debug(f'Using yolo folder: {yolo}')
                 yolo_folder_path = Path(yolo)
             else:
                 assert yolo in yolo_detector_folders.keys(), f'got an invalid yolo argument: {yolo}\n' \
-                    f'Valid arguments are a yolo folder path or: {list(yolo_detector_folders.keys())}'
+                    f'Valid arguments are a yolo folder folder or: {list(yolo_detector_folders.keys())}'
                 logger.debug(f'Using yolo: {yolo}')
                 yolo_folder_path = yolo_detector_folders[yolo]
 
@@ -152,8 +152,8 @@ def detect_gen(yolo=None):
 def main():
     # construct the argument parse and parse the arguments
     ap = argparse.ArgumentParser()
-    ap.add_argument("-i", "--image", required=True, help="path to input image")
-    ap.add_argument("-y", "--yolo", required=True, help="YOLO version or base path to YOLO directory")
+    ap.add_argument("-i", "--image", required=True, help="folder to input image")
+    ap.add_argument("-y", "--yolo", required=True, help="YOLO version or base folder to YOLO directory")
     ap.add_argument("-c", "--confidence", type=float, default=DEFAULT_CONFIDENCE,
                     help="minimum probability to filter weak detections")
     ap.add_argument("-t", "--threshold", type=float, default=DEFAULT_THRESHOLD,
