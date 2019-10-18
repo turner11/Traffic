@@ -18,6 +18,10 @@ class Payload(object):
     def elapsed(self):
         return self.i_frame / float(self.fps)
 
+    @property
+    def session_data_frames(self):
+        return self.session['dfs']
+
     def __init__(self, frame=None, session=None, detections=None, key_pressed=None, tracking_rois=None, i_frame=None):
         """
 
@@ -42,9 +46,10 @@ class Payload(object):
         self.i_frame = i_frame
         self.dfs = {}
         self.viewables = {}
+        self.images = {}
 
     def get_df_frame_detections(self):
-        df = self.session['dfs'].get('detections')
+        df = self.session_data_frames.get('detections')
         if df is None:
             df = pd.DataFrame()
         else:
@@ -52,10 +57,10 @@ class Payload(object):
         return df
 
     def get_session_df(self, key, default_value=None):
-        return self.session['dfs'].get(key, default_value)
+        return self.session_data_frames.get(key, default_value)
 
     def set_session_df(self, key, df):
-        self.session['dfs'][key] = df
+        self.session_data_frames[key] = df
 
     def __repr__(self):
         return super().__repr__()
