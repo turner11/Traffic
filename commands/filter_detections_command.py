@@ -37,7 +37,7 @@ class FilterDetectionCommandByRois(FrameCommand):
 
         def is_detection_in_results(detection):
             b = detection.bounding_box
-            return any((df_in_roi.x == b.x) & (df_in_roi.y == b.y))
+            return len(df_in_roi) > 0 and any((df_in_roi.x == b.x) & (df_in_roi.y == b.y))
 
         detections = [d for d in payload.detections if is_detection_in_results(d)]
 
