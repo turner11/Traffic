@@ -1,80 +1,88 @@
+from collections import defaultdict
+
+import pandas as pd
 import argparse
-from collections import namedtuple
 from pathlib import Path
 from typing import Union
-import pandas as pd
 import logging
 
 from common.exceptions import ArgumentException
 from settings import setup
-from settings.all_cameras import data as cameras_dict
+import settings.all_cameras as cameras#import df_cameras, col_title, col_name, col_url
 from pipelines.pipeline_director import get_auto_track_pipeline, get_debug_pipeline, get_road_roi_pipeline
 
 from common.utils import init_log
 
-# pd.set_option('display.max_columns', 500)
-# pd.set_option('display.width', 1000)
 logger = logging.getLogger(__name__)
 
 
-def get_url(camera_id: Union[int, str] = None):
+def get_camera_info(camera_id: Union[int, str] = None):
+    df_cameras = cameras.get_all_cameras()
+
     if camera_id is not None:
-        if Path(str(camera_id)).exists():
+        df_match = df_cameras[df_cameras[cameras.col_name].str.lower() == str(camera_id).lower()]
+        if len(df_match) == 1:
+            s_data = df_match.iloc[0]
+            return s_data
+        elif Path(str(camera_id)).exists():
             # This allows specifying a file
             path = str(camera_id)
             title = Path(path).name.split('.')[0]
-            return path, title
+            data_factory = defaultdict(lambda:None)
+            data_factory[cameras.col_name] = title
+            data_factory[cameras.col_title] = title
+            data_factory[cameras.col_url] = path
+            s_data = pd.Series({c:data_factory[c] for c in df_cameras.columns})
+            return s_data
         if not str(camera_id).isdigit():
-            raise ArgumentException(f'camera_id must be a valid path or an integer '
+            raise ArgumentException(f'camera_id must be a valid folder or an integer '
                                     f'(got {type(camera_id).__name__} - {camera_id})')
 
-    col_index, col_name, col_title, col_url = 'index', 'name', 'title', 'player_url_web'
-    CameraInfo = namedtuple('CameraInfo', [col_index, col_name, col_title, col_url])
-    all_cameras = [CameraInfo(i, d['name'], d['title'], d['player_url_web']) for i, d in enumerate(cameras_dict)]
-
-    df = pd.DataFrame(all_cameras).set_index(col_index)
 
     if camera_id is None:
-        print(df[[col_name, col_title]].to_string())
+        print(df_cameras[[cameras.col_name, cameras.col_title]].to_string())
         camera_id = input('please select a camera (integer)')
         if camera_id.isdigit():
             camera_id = int(camera_id)
 
-        min_id = min(df.index)
-        max_id = max(df.index)
+        min_id = min(df_cameras.index)
+        max_id = max(df_cameras.index)
         while not isinstance(camera_id, int) or camera_id < min_id or max_id < camera_id:
             camera_id = input(f'input must be a valid integer between {min_id} and {max_id}')
             if camera_id.isdigit():
                 camera_id = int(camera_id)
 
     camera_id = int(camera_id)
-    selected_row = df.loc[camera_id]
-    msg = f'using camera: {selected_row[col_name]}'
+    selected_row = df_cameras.loc[camera_id]
+    msg = f'using camera: {selected_row[cameras.col_name]}'
     logger.debug(msg)
 
-    url = selected_row[col_url]
-    title = selected_row[col_name]
-    return url, title
+    return selected_row
 
 
 def main(camera_id=None, yolo=None, save_folder=None):
     init_log()
-    url, title = get_url(camera_id)
+    camera_data = get_camera_info(camera_id)
 
     # get_debug_pipeline
     # get_road_roi_pipeline
     # get_auto_track_pipeline
 
-    pipeline, observer = get_road_roi_pipeline(url, yolo=yolo, title=title.lower(), save_folder=save_folder)
+    pipeline, observer = get_road_roi_pipeline(camera_data.url, yolo=yolo, title=camera_data.camera_name.lower(), save_folder=save_folder)
 
+    logger.debug(f'subscribing observer ({observer}) to pipeline.')
     pipeline.subscribe(observer)
 
 
 if __name__ == '__main__':
+    pd.set_option('display.max_rows', 500)
+    pd.set_option('display.max_columns', 500)
+    pd.set_option('display.width', 1000)
+
     parser = argparse.ArgumentParser(description='')
     parser.add_argument('-c', dest='camera', help='the id of camera to use or URL', required=False, default=None)
     parser.add_argument('-f', dest='folder', help='The folder to save stream to', required=False, default=None)
-    parser.add_argument("-y", "--yolo", required=False, help="YOLO version or base path to YOLO directory",
+    parser.add_argument("-y", "--yolo", required=False, help="YOLO version or base folder to YOLO directory",
                         default='v3')
 
     parser.add_argument('-s', dest='setup', help='setup folder - e.g. Download weights', required=False, default=None,
