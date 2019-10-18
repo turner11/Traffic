@@ -7,6 +7,7 @@ from commands.draw_bounding_box_command import DrawBoundingBoxCommand
 from commands.filter_detections_command import FilterDetectionCommandByRois
 from commands.find_road_roi_command import FindRoadRoiCommand
 from commands.invalidate_trackers_command import InvalidateTrackersCommand
+from commands.median_command import MedianCommand
 from commands.policy_controller import EveryNSecondsPolicy, DelayedStartPolicy  # EveryNFramesPolicy
 from commands.track_command import TrackCommand
 from common.exceptions import ArgumentException
@@ -65,7 +66,8 @@ def _get_road_roi_detector_operators(detector=None, tracker=None, **args):
 
     str(tracker)
 
-    detection_n_seconds = 3
+    detection_n_seconds = 1.5
+    median_n_secs = 1
     delay_seconds = 60.
 
     cmd_detect = DetectCommand(affective_detector, policy_controller=EveryNSecondsPolicy(n=detection_n_seconds))
@@ -73,12 +75,12 @@ def _get_road_roi_detector_operators(detector=None, tracker=None, **args):
     raw_data_layers = [cmd_detect]
 
     processing_layers = [
-        # MedianCommand(policy_controller=EveryNFramesPolicy(n=median_n_frames)),
+        MedianCommand(policy_controller=EveryNSecondsPolicy(n=median_n_secs)),
         FindRoadRoiCommand(),
         FilterDetectionCommandByRois(),
         SetDetectionsForTrackingCommand(),
         TrackCommand(tracker, policy_controller=DelayedStartPolicy(n_seconds=delay_seconds)),
-        InvalidateTrackersCommand(policy_controller=DelayedStartPolicy(n_seconds=delay_seconds))
+        InvalidateTrackersCommand(policy_controller=EveryNSecondsPolicy(n=1))
 
     ]
 
