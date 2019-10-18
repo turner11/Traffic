@@ -120,15 +120,15 @@ def _get_pipeline(get_operators, url, title=None, save_folder=None, **args):
                  ]
 
     observer = ObserverComposition(observers=observers)
-    # if save_folder:
-    #     path = Path(save_folder)
-    #
-    #     file_name = path / (title + '.avi')
-    #     save_video_observer = SaveVideoObserver(path=file_name, title=title)
-    #     observers.append(save_video_observer)
 
-    # file_name = path / 'detections.prqt'
-    # save_data_observer = SaveTabularDataObserver(file_name)
-    # observers.append(save_data_observer)
+    if save_folder:
+        path = Path(save_folder)
+
+        # file_name = folder / (title + '.avi')
+        # save_video_observer = SaveVideoObserver(folder=file_name, title=title)
+        # observers.append(save_video_observer)
+
+        save_data_observer = SaveTabularDataObserver(path)
+        observers.append(save_data_observer)
 
     return pipeline, observer
