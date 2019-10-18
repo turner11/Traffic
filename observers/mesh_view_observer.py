@@ -17,7 +17,10 @@ class MeshViewObserver(ObserverBase):
         self.title = title
         self.cmd_displayDebug = DisplayDebugCommand()
         self.cmd_drawStats = DrawStatsCommand()
+        self.current_payload = None
+
     def on_next(self, payload):
+        self.current_payload = payload
         frame = payload.frame
         viewables = list(payload.viewables.values())
         viewables.insert(0, frame)
@@ -30,8 +33,8 @@ class MeshViewObserver(ObserverBase):
                 viewables.append(frame)
 
             frame_shape = frame.shape
-            scale = 1/len(viewables)
-            new_size = tuple(int(v) for v in [frame_shape[0]*scale, frame_shape[1]*scale])
+            scale = 1 / len(viewables)
+            new_size = tuple(int(v) for v in [frame_shape[0] * scale, frame_shape[1] * scale])
             processed = []
             for img in viewables:
                 img = cv2.resize(img, new_size)
@@ -44,8 +47,8 @@ class MeshViewObserver(ObserverBase):
 
             items_in_row = 2
             res = []
-            for i in range(items_in_row, len(processed)+items_in_row , items_in_row):
-                items = processed[i-items_in_row: items_in_row]
+            for i in range(items_in_row, len(processed) + items_in_row, items_in_row):
+                items = processed[i - items_in_row: items_in_row]
                 horizontal_stacked = np.hstack(items)
                 if len(res) > 0:
                     res = np.vstack((res, horizontal_stacked))
@@ -61,3 +64,8 @@ class MeshViewObserver(ObserverBase):
         cv2.namedWindow(self.title, cv2.WINDOW_NORMAL)
         cv2.imshow(self.title, payload.frame)
 
+    def on_completed(self):
+        super().on_completed()
+
+    def on_error(self, error):
+        super().on_error(error)
