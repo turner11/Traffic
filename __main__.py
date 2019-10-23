@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 
 def get_camera_info(camera_id: Union[int, str] = None):
     df_cameras = cameras.get_all_cameras()
-
+    df_str = df_cameras[[cameras.col_name, cameras.col_title]].to_string()
     if camera_id is not None:
         df_match = df_cameras[df_cameras[cameras.col_name].str.lower() == str(camera_id).lower()]
         if len(df_match) == 1:
@@ -35,12 +35,13 @@ def get_camera_info(camera_id: Union[int, str] = None):
             s_data = pd.Series({c:data_factory[c] for c in df_cameras.columns})
             return s_data
         if not str(camera_id).isdigit():
+            print(f'Valid cameras:\n{df_str}')
             raise ArgumentException(f'camera_id must be a valid folder or an integer '
                                     f'(got {type(camera_id).__name__} - {camera_id})')
 
 
     if camera_id is None:
-        print(df_cameras[[cameras.col_name, cameras.col_title]].to_string())
+        print(df_str)
         camera_id = input('please select a camera (integer)')
         if camera_id.isdigit():
             camera_id = int(camera_id)
