@@ -13,3 +13,7 @@ run.bat
 pipfile_backup/*
 experimental/Untitled.ipynb
 Untitled.ipynb
+experimental/experimantal_main.py
+**/bin/Debug/*
+**/.vs/*
+**/obj/*
