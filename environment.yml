@@ -1,0 +1,49 @@
+
+name: traffic39
+dependencies:
+  - python >=3.9
+  - anaconda
+  - pytest
+  - bokeh
+  - numpy
+  - scipy
+  - matplotlib
+  - opencv
+  - coloredlogs
+  - pandas
+  - tqdm
+  - requests
+  - seaborn
+  - pyarrow
+  - scikit-learn
+#  - holoviews
+  - pip
+
+# works for regular pip packages
+  - pip:
+      - imutils
+      - pytest-icdiff
+      - rx # = ">=3.0.0b4"
+      - streamlit
+      - grpcio
+      - grpcio-tools
+#  - labelimg
+#  - dtw
+#  - sklearn
+#  - opencv-python
+#  - opencv-contrib-python
+
+# run: conda env create --file environment.yml
+
+#For update:
+#  conda env update --name traffic39 --file environment.yml
+
+#jupyter = "*"
+#jupyterlab = "*"#"==1.1.3"
+#pywin32 = "==224"
+
+
+#ipython kernel install --name "Traffic" --user
+#jupyter kernelspec list
+# If on windows, the python that runs lab should not have pywin32==225 - its breaking the notebook
+#pip install --upgrade pywin32==224
