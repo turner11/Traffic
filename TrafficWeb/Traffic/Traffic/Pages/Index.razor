@@ -1,0 +1,11 @@
+﻿@page "/"
+
+@if (this.AppState.Camera != null)
+{
+    <img src="@this.AppState.Camera.ImagePreview"/>
+}
+    <!--<video src="rtmps://5d8c50e7b358f.streamlock.net/live/LATRUN.stream">-->
+        @* Fall back here *@
+    <!--</video>-->
+        
+        
