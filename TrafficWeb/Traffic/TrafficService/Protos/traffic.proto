@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+option csharp_namespace = "Traffic";
+
+package greet;
+
+// The greeting service definition.
+service TrafficService {
+  // Sends a greeting
+  rpc GetCameras (CamerasRequest) returns (CamerasReply);
+}
+
+// The request message containing the user's name.
+message CamerasRequest {
+}
+
+// The response message containing the greetings.
+message CamerasReply {
+  repeated Camera cameras = 1;
+}
+
+message Camera{
+    string name = 1;
+    string image_preview = 2;
+    string url = 3;
+}
+
+
+//python -m grpc_tools.protoc -ITrafficWeb\Traffic\TrafficService\Protos --python_out=. --grpc_python_out=. TrafficWeb\Traffic\TrafficService\Protos\traffic.proto
+
+
