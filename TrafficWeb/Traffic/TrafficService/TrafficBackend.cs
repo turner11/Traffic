@@ -2,6 +2,7 @@
 using Grpc.Net.Client;
 using System;
 using System.Collections.Generic;
+using System.Reactive.Linq;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -36,6 +37,14 @@ namespace Traffic
             var client = new TrafficService.TrafficServiceClient(this.Channel);
             CamerasReply reply = await client.GetCamerasAsync(new CamerasRequest()).ResponseAsync;
             return reply.Cameras.ToList();
+        }
+
+        internal IObservable<FrameReply> GetStream(Camera camera)
+        {
+            var client = new TrafficService.TrafficServiceClient(this.Channel);
+            AsyncServerStreamingCall<FrameReply> streamCall= client.GetStream(new StreamRequest() { Source = camera.Url });
+            IObservable<FrameReply> observable = streamCall.ResponseStream.ReadAllAsync().ToObservable();
+            return observable;
         }
     }
 }

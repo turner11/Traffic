@@ -11,13 +11,21 @@ from common.types import TrackedBoundingBox
 OPENCV_OBJECT_TRACKERS = OrderedDict([
     ('csrt', cv2.TrackerCSRT_create),
     ('kcf', cv2.TrackerKCF_create),
-    ('mosse', cv2.TrackerMOSSE_create),
-    ('boosting', cv2.TrackerBoosting_create),
     ('mil', cv2.TrackerMIL_create),
-    ('tld', cv2.TrackerTLD_create),
-    ('medianflow', cv2.TrackerMedianFlow_create),
+
 ]
 )
+# Hack: missing package
+try:
+    OPENCV_OBJECT_TRACKERS += [
+        ('mosse', cv2.TrackerMOSSE_create),
+        ('boosting', cv2.TrackerBoosting_create),
+        ('tld', cv2.TrackerTLD_create),
+        ('medianflow', cv2.TrackerMedianFlow_create),
+    ]
+except Exception as ex:
+    pass
+
 
 # KCF: Fast and accurate
 # CSRT: More accurate than KCF but slower

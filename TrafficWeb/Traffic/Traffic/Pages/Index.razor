@@ -1,11 +1,7 @@
 ﻿@page "/"
 
-@if (this.AppState.Camera != null)
+@if (this.ShowCameraElements)
 {
     <img src="@this.AppState.Camera.ImagePreview"/>
+    @*<VideoStreamer Id="rawStreamer" @ref="RawVideoStreamer"></VideoStreamer>*@
 }
-    <!--<video src="rtmps://5d8c50e7b358f.streamlock.net/live/LATRUN.stream">-->
-        @* Fall back here *@
-    <!--</video>-->
-        
-        

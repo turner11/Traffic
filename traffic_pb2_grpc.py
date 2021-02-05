@@ -20,6 +20,11 @@ class TrafficServiceStub(object):
                 request_serializer=traffic__pb2.CamerasRequest.SerializeToString,
                 response_deserializer=traffic__pb2.CamerasReply.FromString,
                 )
+        self.GetStream = channel.unary_stream(
+                '/greet.TrafficService/GetStream',
+                request_serializer=traffic__pb2.StreamRequest.SerializeToString,
+                response_deserializer=traffic__pb2.FrameReply.FromString,
+                )
 
 
 class TrafficServiceServicer(object):
@@ -33,6 +38,12 @@ class TrafficServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def GetStream(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_TrafficServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -40,6 +51,11 @@ def add_TrafficServiceServicer_to_server(servicer, server):
                     servicer.GetCameras,
                     request_deserializer=traffic__pb2.CamerasRequest.FromString,
                     response_serializer=traffic__pb2.CamerasReply.SerializeToString,
+            ),
+            'GetStream': grpc.unary_stream_rpc_method_handler(
+                    servicer.GetStream,
+                    request_deserializer=traffic__pb2.StreamRequest.FromString,
+                    response_serializer=traffic__pb2.FrameReply.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -66,5 +82,22 @@ class TrafficService(object):
         return grpc.experimental.unary_unary(request, target, '/greet.TrafficService/GetCameras',
             traffic__pb2.CamerasRequest.SerializeToString,
             traffic__pb2.CamerasReply.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def GetStream(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_stream(request, target, '/greet.TrafficService/GetStream',
+            traffic__pb2.StreamRequest.SerializeToString,
+            traffic__pb2.FrameReply.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
