@@ -8,6 +8,7 @@ package greet;
 service TrafficService {
   // Sends a greeting
   rpc GetCameras (CamerasRequest) returns (CamerasReply);
+  rpc GetStream (StreamRequest) returns (stream FrameReply);
 }
 
 // The request message containing the user's name.
@@ -19,10 +20,27 @@ message CamerasReply {
   repeated Camera cameras = 1;
 }
 
+
 message Camera{
     string name = 1;
     string image_preview = 2;
     string url = 3;
+}
+
+message StreamRequest{
+  string source = 1;
+}
+message FrameReply{
+  int32 frame_id = 1;
+  Image image = 2;
+  Image raw_image = 3;
+}
+
+
+message Image{
+  bytes jpg = 1;
+  int32 width = 2;
+  int32 height = 3;
 }
 
 

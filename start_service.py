@@ -22,9 +22,35 @@ class TrafficService(traffic_pb2_grpc.TrafficServiceServicer):
                    for name, url, image in zip(titles, urls, image_urls)]
         # print(cameras)
 
+
         reply = traffic_pb2.CamerasReply()
         reply.cameras.extend(cameras)
         return reply
+
+    async def GetStream(self, request: traffic_pb2.StreamRequest, context):
+
+        # pipeline, observer = get_auto_track_pipeline(url=request.source, yolo='v3', title='')
+        from pipelines.pipeline_director import get_source_generator#,  get_auto_track_pipeline
+        from pipelines._pipeline_operators import _get_auto_track_commands
+        from cv2 import cv2
+
+        source = request.source
+        commands = _get_auto_track_commands()
+        gen = get_source_generator(source)
+        for i, (success, payload) in enumerate(gen):
+            # if not context.is_active():
+            #     break
+            if success:
+                for op in commands:
+                    payload = op(payload)
+
+                frame_reply = traffic_pb2.FrameReply(frame_id=payload.i_frame)
+
+                success_jpg, np_jpg_bytes = cv2.imencode('.jpg', payload.frame)
+                frame_reply.image.jpg = np_jpg_bytes.tobytes()
+                frame_reply.image.width = payload.frame.shape[1]
+                frame_reply.image.height = payload.frame.shape[0]
+                yield frame_reply
 
 
 async def serve() -> None:

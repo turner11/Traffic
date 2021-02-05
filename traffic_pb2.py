@@ -19,7 +19,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   syntax='proto3',
   serialized_options=b'\252\002\007Traffic',
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\rtraffic.proto\x12\x05greet\"\x10\n\x0e\x43\x61merasRequest\".\n\x0c\x43\x61merasReply\x12\x1e\n\x07\x63\x61meras\x18\x01 \x03(\x0b\x32\r.greet.Camera\":\n\x06\x43\x61mera\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x15\n\rimage_preview\x18\x02 \x01(\t\x12\x0b\n\x03url\x18\x03 \x01(\t2J\n\x0eTrafficService\x12\x38\n\nGetCameras\x12\x15.greet.CamerasRequest\x1a\x13.greet.CamerasReplyB\n\xaa\x02\x07Trafficb\x06proto3'
+  serialized_pb=b'\n\rtraffic.proto\x12\x05greet\"\x10\n\x0e\x43\x61merasRequest\".\n\x0c\x43\x61merasReply\x12\x1e\n\x07\x63\x61meras\x18\x01 \x03(\x0b\x32\r.greet.Camera\":\n\x06\x43\x61mera\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x15\n\rimage_preview\x18\x02 \x01(\t\x12\x0b\n\x03url\x18\x03 \x01(\t\"\x1f\n\rStreamRequest\x12\x0e\n\x06source\x18\x01 \x01(\t\"\\\n\nFrameReply\x12\x10\n\x08\x66rame_id\x18\x01 \x01(\x05\x12\x1b\n\x05image\x18\x02 \x01(\x0b\x32\x0c.greet.Image\x12\x1f\n\traw_image\x18\x03 \x01(\x0b\x32\x0c.greet.Image\"3\n\x05Image\x12\x0b\n\x03jpg\x18\x01 \x01(\x0c\x12\r\n\x05width\x18\x02 \x01(\x05\x12\x0e\n\x06height\x18\x03 \x01(\x05\x32\x82\x01\n\x0eTrafficService\x12\x38\n\nGetCameras\x12\x15.greet.CamerasRequest\x1a\x13.greet.CamerasReply\x12\x36\n\tGetStream\x12\x14.greet.StreamRequest\x1a\x11.greet.FrameReply0\x01\x42\n\xaa\x02\x07Trafficb\x06proto3'
 )
 
 
@@ -127,10 +127,139 @@ _CAMERA = _descriptor.Descriptor(
   serialized_end=148,
 )
 
+
+_STREAMREQUEST = _descriptor.Descriptor(
+  name='StreamRequest',
+  full_name='greet.StreamRequest',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  create_key=_descriptor._internal_create_key,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='source', full_name='greet.StreamRequest.source', index=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"".decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=150,
+  serialized_end=181,
+)
+
+
+_FRAMEREPLY = _descriptor.Descriptor(
+  name='FrameReply',
+  full_name='greet.FrameReply',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  create_key=_descriptor._internal_create_key,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='frame_id', full_name='greet.FrameReply.frame_id', index=0,
+      number=1, type=5, cpp_type=1, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='image', full_name='greet.FrameReply.image', index=1,
+      number=2, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='raw_image', full_name='greet.FrameReply.raw_image', index=2,
+      number=3, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=183,
+  serialized_end=275,
+)
+
+
+_IMAGE = _descriptor.Descriptor(
+  name='Image',
+  full_name='greet.Image',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  create_key=_descriptor._internal_create_key,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='jpg', full_name='greet.Image.jpg', index=0,
+      number=1, type=12, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"",
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='width', full_name='greet.Image.width', index=1,
+      number=2, type=5, cpp_type=1, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='height', full_name='greet.Image.height', index=2,
+      number=3, type=5, cpp_type=1, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=277,
+  serialized_end=328,
+)
+
 _CAMERASREPLY.fields_by_name['cameras'].message_type = _CAMERA
+_FRAMEREPLY.fields_by_name['image'].message_type = _IMAGE
+_FRAMEREPLY.fields_by_name['raw_image'].message_type = _IMAGE
 DESCRIPTOR.message_types_by_name['CamerasRequest'] = _CAMERASREQUEST
 DESCRIPTOR.message_types_by_name['CamerasReply'] = _CAMERASREPLY
 DESCRIPTOR.message_types_by_name['Camera'] = _CAMERA
+DESCRIPTOR.message_types_by_name['StreamRequest'] = _STREAMREQUEST
+DESCRIPTOR.message_types_by_name['FrameReply'] = _FRAMEREPLY
+DESCRIPTOR.message_types_by_name['Image'] = _IMAGE
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
 CamerasRequest = _reflection.GeneratedProtocolMessageType('CamerasRequest', (_message.Message,), {
@@ -154,6 +283,27 @@ Camera = _reflection.GeneratedProtocolMessageType('Camera', (_message.Message,),
   })
 _sym_db.RegisterMessage(Camera)
 
+StreamRequest = _reflection.GeneratedProtocolMessageType('StreamRequest', (_message.Message,), {
+  'DESCRIPTOR' : _STREAMREQUEST,
+  '__module__' : 'traffic_pb2'
+  # @@protoc_insertion_point(class_scope:greet.StreamRequest)
+  })
+_sym_db.RegisterMessage(StreamRequest)
+
+FrameReply = _reflection.GeneratedProtocolMessageType('FrameReply', (_message.Message,), {
+  'DESCRIPTOR' : _FRAMEREPLY,
+  '__module__' : 'traffic_pb2'
+  # @@protoc_insertion_point(class_scope:greet.FrameReply)
+  })
+_sym_db.RegisterMessage(FrameReply)
+
+Image = _reflection.GeneratedProtocolMessageType('Image', (_message.Message,), {
+  'DESCRIPTOR' : _IMAGE,
+  '__module__' : 'traffic_pb2'
+  # @@protoc_insertion_point(class_scope:greet.Image)
+  })
+_sym_db.RegisterMessage(Image)
+
 
 DESCRIPTOR._options = None
 
@@ -164,8 +314,8 @@ _TRAFFICSERVICE = _descriptor.ServiceDescriptor(
   index=0,
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_start=150,
-  serialized_end=224,
+  serialized_start=331,
+  serialized_end=461,
   methods=[
   _descriptor.MethodDescriptor(
     name='GetCameras',
@@ -174,6 +324,16 @@ _TRAFFICSERVICE = _descriptor.ServiceDescriptor(
     containing_service=None,
     input_type=_CAMERASREQUEST,
     output_type=_CAMERASREPLY,
+    serialized_options=None,
+    create_key=_descriptor._internal_create_key,
+  ),
+  _descriptor.MethodDescriptor(
+    name='GetStream',
+    full_name='greet.TrafficService.GetStream',
+    index=1,
+    containing_service=None,
+    input_type=_STREAMREQUEST,
+    output_type=_FRAMEREPLY,
     serialized_options=None,
     create_key=_descriptor._internal_create_key,
   ),

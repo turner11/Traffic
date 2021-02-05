@@ -87,6 +87,42 @@ def url_to_source_function(url):
 
     return source_func
 
+def get_source_generator(url):
+    cap = cv2.VideoCapture(url)
+    if not cap.isOpened():
+        yield (False, "Error opening video stream or file")
+
+    stream_fps = _get_stream_fps(cap)
+    session = {'fps': stream_fps, 'dfs': {}}
+
+    fps = FPS().start()
+    i_frame = -1
+    try:
+        while cap.isOpened():
+            is_read_success, raw_frame = cap.read()
+            if is_read_success:
+                i_frame += 1
+                # Using the FPS for getting smooth video while waiting
+                fps.update()
+                fps.stop()
+
+                wait_time = round(max(fps.fps(), 1))
+                key = chr(cv2.waitKey(wait_time) & 0xFF)
+                is_q_pressed = key == 'q'
+
+                if is_q_pressed:
+                    break
+
+                payload = Payload(frame=raw_frame, session=session, key_pressed=key, i_frame=i_frame)
+                yield (True, payload)
+
+            else:
+                yield (False, "Failed to read video capture")
+                break
+    finally:
+        cap.release()
+        cv2.destroyAllWindows()
+
 
 def get_auto_track_pipeline(url, detector=None, tracker=None, **args):
     from pipelines._pipeline_operators import _get_auto_track_operators

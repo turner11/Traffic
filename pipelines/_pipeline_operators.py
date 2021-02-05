@@ -19,20 +19,34 @@ from yolo_detectors.yolo_detector import YoloDetector
 # from commands.median_command import MedianCommand
 
 
-def append_augmentation_commands(func):
+def append_augmentation_ops(func):
     def wrapper(*args, **kwargs):
-        augmentation_operators = [op.map(cmd) for cmd
-                                  in (DrawBoundingBoxCommand(),)]
+        augmentation_operators = [op.map(cmd) for cmd in (DrawBoundingBoxCommand(),)]
         operators = func(*args, **kwargs)
         return operators + augmentation_operators
 
     return wrapper
 
+def append_augmentation_commands(func):
+    def wrapper(*args, **kwargs):
+        augmentation_commands = [cmd for cmd in (DrawBoundingBoxCommand(),)]
+        operators = func(*args, **kwargs)
+        return operators + augmentation_commands
+
+    return wrapper
+
+
+
+
+
+def _get_auto_track_operators(detector=None, tracker=None, **args):
+    commands = _get_auto_track_commands(detector=detector, tracker=tracker, **args)
+    operators = [op.map(cmd) for cmd in commands]
+    return operators
 
 @append_augmentation_commands
-def _get_auto_track_operators(detector=None, tracker=None, **args):
+def _get_auto_track_commands(detector=None, tracker=None, **args):
     detector = detector or YoloDetector.factory(yolo=args.get('yolo'))
-    tracker = tracker
     cmd_auto_track = AutoTrackCommand(DetectCommand(detector), TrackCommand(tracker))
     raw_data_layers = [cmd_auto_track]
     output_layers = [
@@ -40,12 +54,10 @@ def _get_auto_track_operators(detector=None, tracker=None, **args):
         # MedianCommand()
     ]
     commands = raw_data_layers + output_layers
-    operators = [op.map(cmd) for cmd in commands]
-
-    return operators
+    return commands
 
 
-@append_augmentation_commands
+@append_augmentation_ops
 def _get_debug_operators(detector=None, tracker=None, **args):
     detector = detector or YoloDetector.factory(yolo=args.get('yolo'))
     cmd_detect = DetectCommand(detector)
@@ -58,7 +70,7 @@ def _get_debug_operators(detector=None, tracker=None, **args):
     return operators
 
 
-@append_augmentation_commands
+@append_augmentation_ops
 def _get_road_roi_detector_operators(detector=None, tracker=None, **args):
     affective_detector = detector or YoloDetector.factory(yolo=args.get('yolo'))
     if affective_detector is None:

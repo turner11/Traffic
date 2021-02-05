@@ -53,6 +53,7 @@ class YoloDetector(object):
                 min_confidence: float = None,
                 threshold: float = None):
 
+        yolo = yolo or 'v3'
         if isinstance(yolo, YoloFolder):
             logger.debug(f'Using yolo folder: {yolo}')
             yolo_folder = yolo

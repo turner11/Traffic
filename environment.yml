@@ -27,11 +27,11 @@ dependencies:
       - streamlit
       - grpcio
       - grpcio-tools
+      - opencv-contrib-python
+#  - opencv-python
 #  - labelimg
 #  - dtw
 #  - sklearn
-#  - opencv-python
-#  - opencv-contrib-python
 
 # run: conda env create --file environment.yml
 

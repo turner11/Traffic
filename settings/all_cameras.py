@@ -13,7 +13,7 @@ def get_all_cameras() -> pd.DataFrame:
         _f = urllib.request.urlopen(_link)
         _data_string = _f.read()
         _data = json.loads(_data_string)
-    except urllib.error.HTTPError:
+    except (urllib.error.HTTPError, urllib.error.URLError):
         _data = [{"id": 140, "name": "SHAARHAGAI", "title": "שער הגיא",
                   "image_file": r"http://iroads.bvtech.co.il/upfiles/SHAARHAGAI/shaarhagay.png", "details": "1,TRUE",
                   "host_ip": None, "global_url": "", "server_ip": "", "app_name": "", "app_instance": "",
@@ -1222,7 +1222,9 @@ def get_all_cameras() -> pd.DataFrame:
                   "player_url_web": "rtmps://5c328052cb7f5.streamlock.net/live/KARMIELCENTER.stream",
                   "player_url_ios": "https://5c328052cb7f5.streamlock.net/live/KARMIELCENTER.stream/playlist.m3u8"}]
     _data = sorted(_data, key=lambda d: d['id'])
-    _all_cameras = [CameraInfo(i, d['id'], d['name'], d['title'], d['player_url_web'], d['image_file']) for i, d in
+    # _all_cameras = [CameraInfo(i, d['id'], d['name'], d['title'], d['player_url_web'], d['image_file']) for i, d in
+    #                 enumerate(_data)]
+    _all_cameras = [CameraInfo(i, d['id'], d['name'], d['title'], d['player_url_ios'], d['image_file']) for i, d in
                     enumerate(_data)]
     df_cameras = pd.DataFrame(_all_cameras).sort_values(col_id).reset_index(drop=True).set_index(col_index)
     return df_cameras
