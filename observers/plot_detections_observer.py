@@ -28,7 +28,7 @@ class PlotDetectionsObserver(ObserverBase):
         plt.show()
 
     def on_next(self, payload):
-        df = payload.dfs.get('detections', pd.DataFrame()).drop_duplicates()
+        df = payload.get_session_df('detections', pd.DataFrame()).drop_duplicates()
         plt.title(f'{len(df)} Detections')
 
         h, w = payload.frame.shape[0], payload.frame.shape[1]
@@ -40,16 +40,18 @@ class PlotDetectionsObserver(ObserverBase):
         # sns.scatterplot(x='x', y='y', hue='frame', data=df)
         # sns.scatterplot(x='x', y='y', data=df)
 
-        ## adjust limits
+        # adjust limits
         # max_y = max(df.y)
         # max_x = max(df.x)
 
         vehicle_detections = list(payload.vehicle_detections)
 
-        from common.types import BoundingBox
-        boxes = (d.bounding_box for d in vehicle_detections)
+        boxes = [d.bounding_box for d in vehicle_detections]
         # boxes = (b.get_scaled(0.5) for b in boxes)
-        boxes = (BoundingBox(b.x, b.y + b.h, b.w, int(round(b.h * 0.2))) for b in boxes)
+
+        # This does a pretty good job at catching bottom of vehicle
+        # from common.types import BoundingBox
+        # boxes = (BoundingBox(b.x, b.y + b.h, b.w, int(round(b.h * 0.2))) for b in boxes)
 
         for box in boxes:
             # Create a Rectangle patch
@@ -58,8 +60,9 @@ class PlotDetectionsObserver(ObserverBase):
             # Add the patch to the Axes
             self.ax.add_patch(rect)
 
-        pause_time = 0.001
-        plt.pause(pause_time)
+        if len(boxes):
+            pause_time = 0.0000001
+            plt.pause(pause_time)
 
     def on_completed(self):
         super().on_completed()

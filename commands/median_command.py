@@ -28,7 +28,7 @@ class MedianCommand(FrameCommand):
         # df = payload.dfs.get('detections', pd.DataFrame()).drop_duplicates()
         # if len(df) > 0:
 
-        vehicle_detections = list(payload.vehicle_detections)
+        vehicle_detections = list(payload.detections)
 
         boxes = (d.bounding_box for d in vehicle_detections)
         # boxes = (b.get_scaled(0.5) for b in boxes)
@@ -53,41 +53,11 @@ class MedianCommand(FrameCommand):
             gray[idxs] = detections_median
 
         self.frames.append(gray)
-
-        title = 'Median'
-        cv2.namedWindow(title, cv2.WINDOW_NORMAL)
+        payload.images['median'] = median
         if len(median):
-            cv2.imshow(title, median / 255)
-        # cv2.imshow(title, frame)
-        # cv2.imshow(title, gray / 255)
-
-        # cv2.imwrite(r'median.jpg', median, )
-
-        return payload
-        src = median / 255
-
-        from experimental import demo_erosion_dilatation
-        src = (1-src) *255
-        demo_erosion_dilatation(src, iterations=2)
-
-
-        erosion_size = 5
-        erosion_type = cv2.MORPH_ELLIPSE
-        element = cv2.getStructuringElement(erosion_type, (2 * erosion_size + 1, 2 * erosion_size + 1),
-                                            (erosion_size, erosion_size))
-        erosion_dst = cv2.erode(src, element, iterations=1)
-        cv2.imshow('erosion', erosion_dst)
-
-        erosion_dst = cv2.dilate(src, element, iterations=2)
-        cv2.imshow('dialation', erosion_dst)
-
-        cv2.waitKey(0)
-
-
-        element = cv2.getStructuringElement(erosion_type, (2 * erosion_size + 1, 2 * erosion_size + 1),
-                                            (erosion_size, erosion_size))
-
-        cv2.waitKey(1)
-        # ============================================
+            pass
+            # title = 'Median'
+            # cv2.namedWindow(title, cv2.WINDOW_NORMAL)
+            # cv2.imshow(title, median / 255)
 
         return payload

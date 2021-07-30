@@ -27,7 +27,7 @@ class PlotTrackingObserver(ObserverBase):
         plt.show()
 
     def on_next(self, payload):
-        df = payload.dfs.get('tracking', pd.DataFrame())
+        df = payload.get_session_df('tracking', pd.DataFrame())
         if len(df) > 0:
             plt.title(f'{len(df["id"].drop_duplicates())} tracked items')
 
@@ -54,7 +54,7 @@ class PlotTrackingObserver(ObserverBase):
                     line.set_xdata(x_vec)
                     line.set_ydata(y1_data)
 
-            pause_time = 0.001
+            pause_time = 0.00000001
             plt.pause(pause_time)
 
             # plt.show(block=True)

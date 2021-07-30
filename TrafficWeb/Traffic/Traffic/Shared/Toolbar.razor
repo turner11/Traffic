@@ -1,0 +1,23 @@
+﻿<div class="top-row px-4">
+    @*<MatTextField @bind-Value="@myStringValue" Label="Standard"></MatTextField>*@
+    @*<MatSelectItem @bind-value="@SelectedCamera" Items="@this.Cameras"> </MatSelectItem>*@
+
+    <RadzenDropDown AllowClear="true" TValue="Camera"
+                    FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                    FilterOperator="StringFilterOperator.Contains"
+                    AllowFiltering="true"
+                    Data=@this.Cameras.Select(c=> new { Title=c.Name, Camera=c })
+                    TextProperty="Title"
+                    ValueProperty="Camera"
+                    Change=@(args => OnChange(args as Camera))>
+
+        <Template Context="context">
+
+
+            <RadzenCard Style="width:100%; margin-bottom: 2vw">
+                    <div>@(context.Title)</div>
+                    <RadzenImage Path="@context.Camera.ImagePreview" Style="width:100%;" />
+            </RadzenCard>
+        </Template>
+    </RadzenDropDown>
+</div>

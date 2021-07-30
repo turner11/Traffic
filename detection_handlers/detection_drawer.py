@@ -68,6 +68,6 @@ def _draw_labeled_box(bounding_box, frame, text, color=None):
     lower_right = bounding_box.lower_right
     x = bounding_box.x
     y = bounding_box.y
-    cv2.rectangle(frame, upper_left, lower_right, color, 1)
+    cv2.rectangle(frame, list(upper_left), list(lower_right), color, 1)
     cv2.putText(frame, text, (x, y - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 1)
     return frame

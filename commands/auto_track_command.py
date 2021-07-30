@@ -1,7 +1,5 @@
-import cv2
-
 from commands.abstract_command import FrameCommand
-from commands.collect_tracking_commands import TrackDetectionsCommand
+from commands.collect_tracking_commands import SetDetectionsForTrackingCommand
 
 
 class AutoTrackCommand(FrameCommand):
@@ -11,7 +9,7 @@ class AutoTrackCommand(FrameCommand):
         """"""
         super().__init__(toggle_key='a', policy_controller=policy_controller)
         self.detect_command = detect_command
-        self.collect_command = TrackDetectionsCommand()
+        self.collect_command = SetDetectionsForTrackingCommand()
         self.track_command = track_command
         self.is_on = True
 

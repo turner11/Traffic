@@ -7,3 +7,13 @@ yolo_detectors/output/*
 traffic_logs/*
 yolo_detectors/*/*.weights
 .vscode/settings.json
+.ipynb_checkpoints/*
+experimental/.ipynb_checkpoints/*
+run.bat
+pipfile_backup/*
+experimental/Untitled.ipynb
+Untitled.ipynb
+experimental/experimantal_main.py
+**/bin/Debug/*
+**/.vs/*
+**/obj/*

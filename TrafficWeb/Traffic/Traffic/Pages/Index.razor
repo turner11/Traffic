@@ -1,0 +1,7 @@
+﻿@page "/"
+
+@if (this.ShowCameraElements)
+{
+    <img src="@this.AppState.Camera.ImagePreview"/>
+    @*<VideoStreamer Id="rawStreamer" @ref="RawVideoStreamer"></VideoStreamer>*@
+}
