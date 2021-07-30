@@ -50,6 +50,11 @@ def smooth(df: pd.DataFrame, window: int = 5, center: bool = False, std: float =
     def _smooth(df_id):
         df_id.loc[:, 'x'] = df_id.x.rolling(window=window, win_type='gaussian', center=center).mean(std=std)
         df_id.loc[:, 'y'] = df_id.y.rolling(window=window, win_type='gaussian', center=center).mean(std=std)
+
+        # g = df_id.groupby(df_id.index // 5)
+        # df_id.loc[:, 'x'] = g.x.apply(np.mean)
+        # df_id.loc[:, 'y'] = g.y.apply(np.mean)
+
         df_id = df_id.dropna()
         return df_id
 
@@ -60,5 +65,12 @@ def smooth(df: pd.DataFrame, window: int = 5, center: bool = False, std: float =
 def df_remove_short_series(df):
     groups = df.groupby('id')
     quantiles = groups.agg({'cum_distance': 'max'}).quantile([0.05, 0.1, 0.2, 0.3, 0.4, 0.5])
-    df_ret = groups.filter(lambda df_id: max(df_id.cum_distance) > quantiles.loc[0.1].cum_distance)
-    return df_ret
+    df_ret = groups.filter(lambda df_id: max(df_id.cum_distance) > quantiles.loc[0.05].cum_distance)
+    return df_ret.reset_index(drop=True)
+
+
+def df_remove_close_points(df):
+    _df = df[df.distance > 0]
+    groups = _df.groupby('id')
+    df_ret = groups.apply(lambda df_id: df_id[df_id.distance > df_id.distance.quantile(0.2)])
+    return df_ret.reset_index(drop=True)
