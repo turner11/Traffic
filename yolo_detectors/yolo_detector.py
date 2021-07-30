@@ -80,9 +80,7 @@ class YoloDetector(object):
         min_confidence = self.min_confidence
         threshold = self.threshold
         net = self.net
-
         labels = self.labels
-
         (H, W) = image.shape[:2]
 
         # determine only the *output* layer names that we need from YOLO
@@ -97,50 +95,53 @@ class YoloDetector(object):
 
         layer_outputs = net.forward(ln)
 
-        # initialize our lists of detected bounding boxes, confidences, and
-        # class IDs, respectively
-        initial_detections = []
+        # initialize our lists of detected bounding boxes, confidences, and class IDs, respectively
+        outputs = np.concatenate(layer_outputs)
+        data_cols_count = 4
+        boxes = outputs[:, :data_cols_count]
+        scoresA = outputs[:, data_cols_count+1:]
+        class_ids = np.argmax(scoresA, axis=1)
 
-        # loop over each of the layer outputs
-        for output in layer_outputs:
-            # loop over each of the detections
-            for detection_vector in output:
-                # extract the class ID and confidence (i.e., probability) of
-                # the current object detection
-                scores = detection_vector[5:]
-                class_id = np.argmax(scores)
-                confidence = scores[class_id]
 
-                # filter out weak predictions by ensuring the detected
-                # probability is greater than the minimum probability
+        row_count = scoresA.shape[0]
+        confidences =  np.zeros(row_count)
+        for row_idx in range(scoresA.shape[0]):
+            idx = class_ids[row_idx]
+            conf = scoresA[row_idx][idx]
+            confidences[row_idx] = conf
 
-                if confidence > min_confidence:
-                    # scale the bounding box coordinates back relative to the
-                    # size of the image, keeping in mind that YOLO actually
-                    # returns the center (x, y)-coordinates of the bounding
-                    # box followed by the boxes' width and height
-                    box = detection_vector[0:4] * np.array([W, H, W, H])
-                    (centerX, centerY, width, height) = box.astype("int")
+        idxs = confidences > min_confidence
+        scoresA, class_ids, confidences, boxes = [arr[idxs] for arr in [scoresA, class_ids, confidences, boxes]]
+        # (centerX, centerY, width, height)
+        detections = boxes  * np.array([W, H, W, H])
+        centerX, centerY, width, height = [detections[:, i] for i in range(detections.shape[1])]
+        # use the center (x, y)-coordinates to derive the top  left corner of the bounding box
+        left = (centerX - (width / 2)).astype(int)
+        top = (centerY - (height / 2)).astype(int)
 
-                    # use the center (x, y)-coordinates to derive the top and
-                    # and left corner of the bounding box
-                    x = int(centerX - (width / 2))
-                    y = int(centerY - (height / 2))
-
-                    label = labels[class_id]
-                    bounding_box = BoundingBox(x, y, int(width), int(height))
-
-                    detection = Detection(label, bounding_box, float(confidence))
-                    initial_detections.append(detection)
+        data = np.zeros((scoresA.shape[0], data_cols_count + 2))
+        data[:, :data_cols_count] = np.asanyarray([left, top, width, height]).T
+        data[:, data_cols_count]= confidences
+        data[:, data_cols_count+1]= class_ids
 
         # apply non-maxima suppression to suppress weak, overlapping bounding boxes
-        boxes_as_list = [list(b.bounding_box) for b in initial_detections]
-        confidences = [b.confidence for b in initial_detections]
-        idxs = cv2.dnn.NMSBoxes(boxes_as_list, confidences, min_confidence, threshold)
+        boxes = list(data[:, :data_cols_count].astype(int))
+        confs = list(data[:, data_cols_count])
+        idxs = cv2.dnn.NMSBoxes(boxes,confs , min_confidence, threshold)
         idxs = idxs.flatten() if len(idxs) else []
-        detections = [d for i, d in enumerate(initial_detections) if i in idxs]
+        detections = detections[idxs, :]
 
-        return detections
+        # For now leaving for keeping same API
+        detections_instances = []
+        for i in range(data.shape[0]):
+            row = data[i]
+            x, y, width, height, conf, class_id = row
+            bounding_box = BoundingBox(int(x), int(y), int(width), int(height))
+            label = labels[int(class_id)]
+            detection = Detection(label, bounding_box, float(conf))
+            detections_instances.append(detection)
+
+        return detections_instances
 
 
 def detect_gen(yolo=None):

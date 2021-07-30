@@ -1,10 +1,22 @@
-from collections import namedtuple
-
-Point = namedtuple('Point', ('x', 'y'))
+from dataclasses import dataclass
 
 
+@dataclass
+class Point:
+    x: int
+    y: int
+
+    def __iter__(self):
+        for val in (self.x, self.y):
+            yield val
+
+
+@dataclass
 class BoundingBox(object):
-    """"""
+    x: int
+    y: int
+    w: int
+    h: int
 
     @property
     def upper_left(self):
@@ -13,14 +25,6 @@ class BoundingBox(object):
     @property
     def lower_right(self):
         return Point(self.x + self.w, self.y + self.h)
-
-    def __init__(self, x, y, w, h):
-        """"""
-        super().__init__()
-        self.x = x
-        self.y = y
-        self.w = w
-        self.h = h
 
     def get_scaled(self, factor: float) -> object:
         w = round(self.w * factor)
@@ -48,21 +52,18 @@ class LabeledBoundingBox(BoundingBox):
 
     def __repr__(self):
         return f'{self.__class__.__name__}(self.label={self.label}, ' \
-            f'self.x={self.x}, ' \
-            f'self.y={self.y}, ' \
-            f'self.w={self.w}, ' \
-            f'self.h={self.h})'
+               f'self.x={self.x}, ' \
+               f'self.y={self.y}, ' \
+               f'self.w={self.w}, ' \
+               f'self.h={self.h})'
 
 
-class Detection(object):
+@dataclass
+class Detection:
     """"""
-
-    def __init__(self, label, bounding_box, confidence):
-        """"""
-        super().__init__()
-        self.label = label
-        self.bounding_box = bounding_box
-        self.confidence = confidence
+    label: str
+    bounding_box: BoundingBox
+    confidence: float
 
     def __repr__(self):
         return f'{self.__class__.__name__}(label={self.label}, bounding_box={self.bounding_box}, confidence={self.confidence})'
@@ -81,10 +82,8 @@ class TrackedBoundingBox(LabeledBoundingBox):
 
     def __repr__(self):
         return f'{self.__class__.__name__}(identifier={self.identifier}, ' \
-            f'self.label={self.label}, ' \
-            f'self.x={self.x}, ' \
-            f'self.y={self.y}, ' \
-            f'self.w={self.w}, ' \
-            f'self.h={self.h})'
-
-
+               f'self.label={self.label}, ' \
+               f'self.x={self.x}, ' \
+               f'self.y={self.y}, ' \
+               f'self.w={self.w}, ' \
+               f'self.h={self.h})'

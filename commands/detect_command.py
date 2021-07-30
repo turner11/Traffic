@@ -1,9 +1,19 @@
 import pandas as pd
-from collections import namedtuple
+from dataclasses import dataclass
 from commands.abstract_command import FrameCommand
 
 
-DetectionRowData = namedtuple('DetectionRowData', ['frame', 'x', 'y', 'w', 'h', 'label'])
+@dataclass
+class DetectionRowData:
+    frame: int
+    x: int
+    y: int
+    w: int
+    h: int
+    label: str
+
+
+# DetectionRowData = namedtuple('DetectionRowData', ['frame', 'x', 'y', 'w', 'h', 'label'])
 
 class DetectCommand(FrameCommand):
     """"""
@@ -14,7 +24,7 @@ class DetectCommand(FrameCommand):
         super().__init__(toggle_key='d', policy_controller=policy_controller)
         self.detector = detector
 
-        self.df_detections = pd.DataFrame(columns=DetectionRowData._fields)
+        self.df_detections = pd.DataFrame(columns=DetectionRowData.__dataclass_fields__.keys())
 
     def _execute(self, payload):
         frame = payload.frame
